@@ -164,13 +164,14 @@ import {
 
 import JuriTabbar from './JuriTabbar.vue';
 
+
 const juri = {
   name: 'Dr. Timothy Mumek, S.T., M.T.',
   role: 'Ketua Dewan Juri Kota Manado',
   nip: '197805142003121002',
   org: 'UNIMA / Disdikbud Kota Manado',
   initial: 'TM',
-  photo: '', // isi dengan path foto, misalnya '/assets/juri/timothy.jpg'
+  photo: '/assets/moty.png', // isi dengan path foto, misalnya '/assets/juri/timothy.jpg'
 };
 
 const recap = [

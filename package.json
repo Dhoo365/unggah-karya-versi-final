@@ -1,0 +1,21 @@
+{
+  "name": "my-project",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,web,mobile -c blue,green,magenta \"npm run dev -w apps/api\" \"npm run dev -w apps/web\" \"npm run dev -w apps/mobile\"",
+    "dev:api": "npm run dev -w apps/api",
+    "dev:web": "npm run dev -w apps/web",
+    "dev:mobile": "npm run dev -w apps/mobile",
+    "build": "npm run build -w apps/web && npm run build -w apps/mobile"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  },
+  "allowScripts": {
+    "esbuild@0.25.12": true
+  }
+}

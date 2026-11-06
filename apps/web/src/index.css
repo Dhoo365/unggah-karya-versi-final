@@ -1,1 +1,191 @@
 @import "tailwindcss";
+
+/*
+  Warna & font aplikasi SIKARYA.
+  Diambil dari desain versi mobile supaya web dan mobile terasa satu produk.
+  Contoh pemakaian: bg-navy, text-muted, border-line, bg-soft.
+*/
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+
+  --color-navy: #003178; /* warna utama */
+  --color-navy-dark: #001a6e;
+  --color-primary: #0d47a1;
+  --color-secondary: #00639a;
+
+  --color-ink: #191c1e; /* teks utama */
+  --color-muted: #434652; /* teks sekunder */
+  --color-subtle: #737783; /* teks keterangan */
+
+  --color-line: #c3c6d4; /* garis tebal */
+  --color-line-soft: #e0e3e5; /* garis tipis kartu */
+  --color-surface: #f7f9fb; /* latar halaman */
+
+  --color-soft: #d9e2ff; /* latar biru muda */
+  --color-ice: #cee5ff; /* latar biru langit */
+  --color-gold: #ffba38;
+  --color-gold-ink: #674600;
+}
+
+body {
+  @apply bg-surface text-ink antialiased;
+}
+
+/* ================================================================
+   LANDING PAGE — animasi ringan (hanya CSS, tanpa library)
+   Semua animasi otomatis mati jika pengguna memilih "kurangi gerakan".
+   ================================================================ */
+@theme {
+  --color-pen: #14275e; /* warna tinta ilustrasi */
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* label "stiker" bergaya tinta */
+.sticker {
+  @apply inline-flex items-center gap-2 rounded-full border-[1.5px] border-pen bg-white px-3.5 py-1.5;
+  box-shadow: 2px 2px 0 var(--color-pen);
+}
+
+/* --- hero: teks & ilustrasi muncul saat halaman dibuka --- */
+.hero-intro > * {
+  animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.hero-intro > *:nth-child(2) { animation-delay: 0.08s; }
+.hero-intro > *:nth-child(3) { animation-delay: 0.16s; }
+.hero-intro > *:nth-child(4) { animation-delay: 0.24s; }
+.hero-intro > *:nth-child(5) { animation-delay: 0.32s; }
+.hero-art {
+  animation: rise 0.9s 0.15s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+/* karakter di hero bergerak naik-turun pelan, tidak serempak */
+.hero-art .c-juara { animation: bob 3.2s ease-in-out infinite; }
+.hero-art .c-siswi { animation: bob 3.6s 0.4s ease-in-out infinite; }
+.hero-art .c-hijab { animation: bob 3.4s 0.9s ease-in-out infinite; }
+.hero-art .c-juri { animation: bob 4s 0.2s ease-in-out infinite; }
+.hero-art .sun { animation: pulse 4s ease-in-out infinite; }
+.hero-art .tw { animation: twinkle 2.6s ease-in-out infinite; }
+.hero-art .tw-2 { animation-delay: 0.6s; }
+.hero-art .tw-3 { animation-delay: 1.2s; }
+.hero-art .tw-4 { animation-delay: 1.8s; }
+.hero-art .note-a { animation: drift 5s ease-in-out infinite; }
+.hero-art .note-b { animation: drift 5s 1.5s ease-in-out infinite; }
+
+/* --- muncul saat di-scroll (dipicu <Reveal>) --- */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition-delay: var(--d, 0ms);
+}
+[data-visible='true'] .reveal {
+  opacity: 1;
+  transform: none;
+}
+
+/* garis tinta "tergambar" */
+.ink-draw path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw 0.9s 0.5s ease-out forwards;
+}
+.reveal-scope .ink-draw path {
+  animation: none;
+}
+.reveal-scope[data-visible='true'] .ink-draw path {
+  animation: draw 0.8s 0.4s ease-out forwards;
+}
+
+/* jalur titik pada "Perjalanan sebuah karya" mengalir pelan */
+.trail {
+  animation: flow 1.6s linear infinite;
+}
+.stop-art {
+  transition: transform 0.3s ease;
+}
+.stop:hover .stop-art {
+  transform: translateY(-6px) rotate(-1.5deg);
+}
+
+/* batang kuota terisi saat terlihat */
+.quota-bar {
+  width: 0;
+  transition: width 1s 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+[data-visible='true'] .quota-bar {
+  width: var(--w);
+}
+
+/* balok podium naik dari bawah */
+.podium-step {
+  transform: translateY(100%);
+  transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition-delay: calc(var(--d, 0ms) + 200ms);
+}
+[data-visible='true'] .podium-step {
+  transform: none;
+}
+.podium-card {
+  transition: transform 0.25s ease;
+}
+.podium-card:hover {
+  transform: translateY(-4px);
+}
+
+/* kartu catatan: miring, lurus saat disorot */
+.note-card {
+  transform: rotate(var(--tilt, 0deg));
+  transition: transform 0.25s ease;
+}
+.note-card:hover {
+  transform: rotate(0deg) translateY(-4px);
+}
+
+/* skyline: matahari & bintang */
+.skyline svg {
+  display: block;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.75; }
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(4px, -8px); }
+}
+@keyframes draw {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes flow {
+  to { stroke-dashoffset: -24; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .landing *,
+  .landing *::before,
+  .landing *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .reveal { opacity: 1; transform: none; }
+  .ink-draw path { stroke-dashoffset: 0; }
+  .quota-bar { width: var(--w); }
+  .podium-step { transform: none; }
+}

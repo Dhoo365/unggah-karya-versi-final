@@ -9,7 +9,7 @@ export default function FaqSection() {
   const [buka, setBuka] = useState(0); // indeks pertanyaan yang terbuka, -1 = semua tertutup
 
   return (
-    <Reveal as="section" id="faq" className="mx-auto grid max-w-[1240px] scroll-mt-6 gap-10 px-4 pt-20 sm:px-8 lg:grid-cols-[380px_1fr] lg:gap-16 lg:pt-24">
+    <Reveal as="section" id="faq" className="mx-auto grid max-w-[1240px] scroll-mt-24 gap-10 px-4 pt-20 sm:px-8 lg:grid-cols-[380px_1fr] lg:gap-16 lg:pt-24">
       <div className="reveal">
         <Eyebrow>Pertanyaan</Eyebrow>
         <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-[44px] sm:leading-[1.1]">Yang sering ditanyakan</h2>

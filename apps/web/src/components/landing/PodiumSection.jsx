@@ -18,7 +18,7 @@ const balok = {
 
 export default function PodiumSection() {
   return (
-    <Reveal as="section" id="juara" className="mx-auto max-w-[1240px] scroll-mt-6 px-4 pt-20 sm:px-8 lg:pt-24">
+    <Reveal as="section" id="juara" className="mx-auto max-w-[1240px] scroll-mt-24 px-4 pt-20 sm:px-8 lg:pt-24">
       <div className="reveal mb-10 flex flex-wrap items-end justify-between gap-4">
         <div>
           <Eyebrow>Talenta Emas 2026</Eyebrow>

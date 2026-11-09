@@ -6,7 +6,7 @@ import Reveal from './Reveal.jsx';
 
 export default function JadwalSection() {
   return (
-    <Reveal as="section" id="jadwal" className="mx-auto max-w-[1240px] scroll-mt-6 px-4 pt-20 sm:px-8 lg:pt-24">
+    <Reveal as="section" id="jadwal" className="mx-auto max-w-[1240px] scroll-mt-24 px-4 pt-20 sm:px-8 lg:pt-24">
       <div className="reveal mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
           <Eyebrow>Jadwal Lomba</Eyebrow>

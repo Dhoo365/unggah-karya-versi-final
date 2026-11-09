@@ -49,6 +49,25 @@ html {
   box-shadow: 2px 2px 0 var(--color-pen);
 }
 
+/* menu navbar: garis bawah coretan emas saat disorot */
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 2px;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--color-gold);
+  transform: scaleX(0) rotate(-1.5deg);
+  transform-origin: left;
+  transition: transform 0.25s ease;
+}
+.nav-link:hover::after,
+.nav-link:focus-visible::after {
+  transform: scaleX(1) rotate(-1.5deg);
+}
+
 /* --- hero: teks & ilustrasi muncul saat halaman dibuka --- */
 .hero-intro > * {
   animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;

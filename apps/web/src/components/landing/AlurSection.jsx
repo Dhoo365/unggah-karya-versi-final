@@ -12,7 +12,7 @@ const gambar = { unggah: vUnggah, validasi: vValidasi, nilai: vNilai, juara: vJu
 
 export default function AlurSection() {
   return (
-    <Reveal as="section" id="alur" className="mx-auto max-w-[1240px] scroll-mt-6 px-4 pt-20 sm:px-8 lg:pt-28">
+    <Reveal as="section" id="alur" className="mx-auto max-w-[1240px] scroll-mt-24 px-4 pt-20 sm:px-8 lg:pt-28">
       <div className="reveal mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
           <Eyebrow>Alur</Eyebrow>

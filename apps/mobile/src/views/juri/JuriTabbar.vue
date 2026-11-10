@@ -37,9 +37,9 @@ const router = useRouter();
 
 const tabs = [
   { label: 'Lomba Tugas', to: '/berandajuri', icon: clipboardOutline, iconActive: clipboard },
-  { label: 'Antrean', to: '/juri/antrean', icon: playCircleOutline, iconActive: playCircle, dot: true },
-  { label: 'Riwayat', to: '/juri/riwayat', icon: checkboxOutline, iconActive: checkbox },
-  { label: 'Profil', to: '/juri/profil', icon: personOutline, iconActive: person },
+  { label: 'Antrean', to: '/antreanjuri', icon: playCircleOutline, iconActive: playCircle, dot: true },
+  { label: 'Riwayat', to: '/riwayatjuri', icon: checkboxOutline, iconActive: checkbox },
+  { label: 'Profil', to: '/profiljuri', icon: personOutline, iconActive: person },
 ];
 </script>
 

@@ -13,6 +13,13 @@ import AdminTalenta from '@/views/admin/AdminTalenta.vue';
 
 // Halaman juri
 import JuriLombaTugas from '@/views/juri/JuriLombaTugas.vue';
+import JuriAnteran from '../views/juri/JuriAnteran.vue';
+import JuriRiwayat from '../views/juri/JuriRiwayat.vue';
+import JuriProfil from '../views/juri/JuriProfil.vue';
+
+//Halaman Guru
+import GuruBeranda from '../views/Guru/GuruBeranda.vue';
+import GuruDataSiswa from '../views/Guru/GuruDataSiswa.vue';
 
 // Halaman contoh (tersambung ke backend)
 import HomePage from '@/views/HomePage.vue';
@@ -21,18 +28,78 @@ const routes = [
   { path: '/', redirect: '/onboarding' },
 
   // onboarding
-  { path: '/onboarding', name: 'Onboarding', component: OnboardingPage },
-  { path: '/onboarding2', name: 'OnboardingSlide2', component: OnBoardingSlide2 },
+  { 
+    path: '/onboarding',
+    name: 'Onboarding', 
+    component: OnboardingPage 
+  },
+  { 
+    path: '/onboarding2', 
+    name: 'OnboardingSlide2', 
+    component: OnBoardingSlide2 
+  },
 
   // admin
-  { path: '/beranda', name: 'Beranda', component: AdminBeranda },
-  { path: '/peserta', name: 'Peserta', component: AdminPeserta },
-  { path: '/juri', name: 'Juri', component: AdminJuri },
-  { path: '/kriteria', name: 'Kriteria', component: AdminKriteria },
-  { path: '/talenta', name: 'Talenta', component: AdminTalenta },
+  { 
+    path: '/beranda', 
+    name: 'Beranda', 
+    component: AdminBeranda 
+  },
+  { 
+    path: '/peserta', 
+    name: 'Peserta', 
+    component: AdminPeserta 
+  },
+  { 
+    path: '/juri', 
+    name: 'Juri', 
+    component: AdminJuri 
+  },
+  { 
+    path: '/kriteria', 
+    name: 'Kriteria', 
+    component: AdminKriteria 
+  },
+  { 
+    path: '/talenta', 
+    name: 'Talenta', 
+    component: AdminTalenta 
+  },
 
   // juri
-  { path: '/berandajuri', name: 'BerandaJuri', component: JuriLombaTugas },
+  { 
+    path: '/berandajuri', 
+    name: 'BerandaJuri', 
+    component: JuriLombaTugas 
+  },
+  {
+    path: '/antreanjuri',
+    name: 'AntreanJuri',
+    component: JuriAnteran
+  },
+  {
+    path: '/riwayatjuri',
+    name: 'RiwayatJuri',
+    component: JuriRiwayat
+  },
+  {
+    path: '/profiljuri',
+    name: 'ProfilJuri',
+    component: JuriProfil
+  },
+
+  // Guru
+ {
+  path: '/berandaguru',
+  name: 'BerandaGuru',
+  component: GuruBeranda
+ },
+ {
+  path: '/datasiswa',
+  name: 'DataSiswa',
+  component: GuruDataSiswa
+ },
+
 
   // contoh koneksi ke backend
   { path: '/home', name: 'Home', component: HomePage },

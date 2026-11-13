@@ -20,6 +20,13 @@ import JuriProfil from '../views/juri/JuriProfil.vue';
 //Halaman Guru
 import GuruBeranda from '../views/Guru/GuruBeranda.vue';
 import GuruDataSiswa from '../views/Guru/GuruDataSiswa.vue';
+import GuruKaryaSiswa from '../views/Guru/GuruKaryaSiswa.vue';
+import GuruKatalogLomba from '../views/Guru/GuruKatalogLomba.vue';
+import GuruPengumuman from '../views/Guru/GuruPengumuman.vue';
+import GuruProfil from '../views/Guru/GuruProfil.vue';
+import GuruKataSandi from '../views/Guru/GuruKataSandi.vue';
+import GuruKontakDapodik from '../views/Guru/GuruKontakDapodik.vue';
+import GuruPanduan from '../views/Guru/GuruPanduan.vue';
 
 // Halaman contoh (tersambung ke backend)
 import HomePage from '@/views/HomePage.vue';
@@ -98,6 +105,41 @@ const routes = [
   path: '/datasiswa',
   name: 'DataSiswa',
   component: GuruDataSiswa
+ },
+ {
+  path: '/karyasiswa',
+  name: 'KaryaSiswa',
+  component: GuruKaryaSiswa
+ },
+ {
+  path: '/kataloglomba',
+  name: 'KaryaSiswa',
+  component: GuruKatalogLomba
+ },
+ {
+  path: '/gurupengumuman',
+  name: 'GuruPengumuman',
+  component: GuruPengumuman
+ },
+ {
+  path: '/guruprofil',
+  name: 'GuruPengumuman',
+  component: GuruProfil
+ },
+ {
+  path: '/gurukatasandi',
+  name: 'gurukatasandi',
+  component: GuruKataSandi
+ },
+ {
+  path: '/gurudapodik',
+  name: 'GuruDapodik',
+  component: GuruKontakDapodik
+ },
+ {
+  path: '/gurupanduan',
+  name: 'GuruPanduan',
+  component: GuruPanduan
  },
 
 

@@ -27,6 +27,20 @@ import GuruProfil from '../views/Guru/GuruProfil.vue';
 import GuruKataSandi from '../views/Guru/GuruKataSandi.vue';
 import GuruKontakDapodik from '../views/Guru/GuruKontakDapodik.vue';
 import GuruPanduan from '../views/Guru/GuruPanduan.vue';
+import GuruPendaftaran from '../views/Guru/GuruPendaftaran.vue';
+import GuruStatusAkun from '../views/Guru/GuruStatusAkun.vue';
+import GuruStatusPerbaikan from '../views/Guru/GuruStatusPerbaikan.vue';
+import GuruPengajuanDitolak from '../views/Guru/GuruPengajuanDitolak.vue';
+import GuruRiwayatSiswa from '../views/Guru/GuruRiwayatSiswa.vue';
+import GuruKelolaStatus from '../views/Guru/GuruKelolaStatus.vue';
+import GuruUnggahKarya from '../views/Guru/GuruUnggahKarya.vue';
+
+//Halaman Siswa
+import SiswaValidasiSertifikat from '../views/Siswa/SiswaValidasiSertifikat.vue';
+import SiswaHasilLomba from '../views/Siswa/SiswaHasilLomba.vue';
+import SiswaProfil from '../views/Siswa/SiswaProfil.vue';
+import SiswaUbahSandi from '../views/Siswa/SiswaUbahSandi.vue';
+
 
 // Halaman contoh (tersambung ke backend)
 import HomePage from '@/views/HomePage.vue';
@@ -140,6 +154,63 @@ const routes = [
   path: '/gurupanduan',
   name: 'GuruPanduan',
   component: GuruPanduan
+ },
+ {
+  path: '/gurupendaftaran',
+  name: 'GuruPendaftaran',
+  component: GuruPendaftaran
+ },
+ {
+  path: '/gurustatusakun',
+  name: 'GuruStatusAkun',
+  component: GuruStatusAkun
+ },
+ {
+  path: '/gurustatusperbaikan',
+  name: 'GuruStatusPerbaikan',
+  component: GuruStatusPerbaikan
+ },
+ {
+  path:'/guruditolak',
+  name: 'guruditolak',
+  component: GuruPengajuanDitolak
+ },
+ {
+  path: '/gururiwayatsiswa',
+  name: 'GuruRiwayatSiswa',
+  component: GuruRiwayatSiswa
+ },
+ {
+  path: '/gurukelolastatus',
+  name: 'GuruKelolaStatus',
+  component: GuruKelolaStatus
+ },
+ {
+  path: '/guruunggahkarya',
+  name: 'GuruUnggahKarya',
+  component: GuruUnggahKarya
+ },
+
+ //Siswa
+ {
+  path: '/siswavalidasi',
+  name: 'SiswaValidasi',
+  component: SiswaValidasiSertifikat
+ },
+ {
+  path: '/siswahasil',
+  name: 'SiswaHasil',
+  component: SiswaHasilLomba
+ },
+ {
+  path: '/siswaprofil',
+  name: 'SiswaProfil',
+  component: SiswaProfil
+ },
+ {
+  path: '/siswaubahsandi',
+  name: 'SiswaUbahSandi',
+  component: SiswaUbahSandi
  },
 
 

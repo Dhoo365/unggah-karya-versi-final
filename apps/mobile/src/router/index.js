@@ -45,7 +45,6 @@ import SiswaUbahSandi from '../views/Siswa/SiswaUbahSandi.vue';
 //Halaman Siswa
 import SiswaBeranda from '../views/Siswa/SiswaBeranda.vue';
 import SiswaUnggahKarya from '../views/Siswa/SiswaUnggahKarya.vue';
-import SiswaValidasiSertifikat from '../views/Siswa/SiswaValidasiSertifikat.vue';
 
 // Halaman contoh (tersambung ke backend)
 import HomePage from '@/views/HomePage.vue';

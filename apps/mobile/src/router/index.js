@@ -21,6 +21,11 @@ import JuriProfil from '../views/juri/JuriProfil.vue';
 import GuruBeranda from '../views/Guru/GuruBeranda.vue';
 import GuruDataSiswa from '../views/Guru/GuruDataSiswa.vue';
 
+//Halaman Siswa
+import SiswaBeranda from '../views/Siswa/SiswaBeranda.vue';
+import SiswaUnggahKarya from '../views/Siswa/SiswaUnggahKarya.vue';
+import SiswaValidasiSertifikat from '../views/Siswa/SiswaValidasiSertifikat.vue';
+
 // Halaman contoh (tersambung ke backend)
 import HomePage from '@/views/HomePage.vue';
 
@@ -99,6 +104,23 @@ const routes = [
   name: 'DataSiswa',
   component: GuruDataSiswa
  },
+
+  // Siswa
+  {
+    path: '/berandasiswa',
+    name: 'BerandaSiswa',
+    component: SiswaBeranda
+  },
+  {
+    path: '/unggahkarya',
+    name: 'UnggahKarya',
+    component: SiswaUnggahKarya
+  },
+  {
+    path: '/validasisertifikat',
+    name: 'ValidasiSertifikat',
+    component: SiswaValidasiSertifikat
+  },
 
 
   // contoh koneksi ke backend

@@ -33,8 +33,8 @@ const route = useRoute();
 const router = useRouter();
 
 const tabs = [
-  { label: 'Beranda', to: '/guru/beranda', icon: homeOutline, iconActive: home },
-  { label: 'Karya Saya', to: '/guru/karya', icon: folderOpenOutline, iconActive: folderOpen },
+  { label: 'Beranda', to: '/berandaguru', icon: homeOutline, iconActive: home },
+  { label: 'Karya Saya', to: '/datasiswa', icon: folderOpenOutline, iconActive: folderOpen },
   { label: 'Penilaian', to: '/guru/penilaian', icon: checkboxOutline, iconActive: checkbox },
   { label: 'Profil', to: '/guru/profil', icon: personCircleOutline, iconActive: personCircle },
 ];

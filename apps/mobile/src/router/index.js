@@ -40,6 +40,14 @@ import SiswaValidasiSertifikat from '../views/Siswa/SiswaValidasiSertifikat.vue'
 import SiswaHasilLomba from '../views/Siswa/SiswaHasilLomba.vue';
 import SiswaProfil from '../views/Siswa/SiswaProfil.vue';
 import SiswaUbahSandi from '../views/Siswa/SiswaUbahSandi.vue';
+import SiswaDaftar from '../views/Siswa/SiswaDaftar.vue';
+import SiswaVerifikasi from '../views/Siswa/SiswaVerifikasi.vue';
+import SiswaAkunStatus from '../views/Siswa/SiswaAkunStatus.vue';
+import SiswaStatusPerbaikan from '../views/Siswa/SiswaStatusPerbaikan.vue';
+import SiswaPengajuanDitolak from '../views/Siswa/SiswaPengajuanDitolak.vue';
+import SiswaPanduan from '../views/Siswa/SiswaPanduan.vue';
+import SiswaUnggah from '../views/Siswa/SiswaUnggah.vue';
+import SiswaBeranda from '../views/Siswa/SiswaBeranda.vue';
 
 
 // Halaman contoh (tersambung ke backend)
@@ -212,7 +220,47 @@ const routes = [
   name: 'SiswaUbahSandi',
   component: SiswaUbahSandi
  },
-
+ {
+  path: '/siswadaftar',
+  name: 'SiswaDaftar',
+  component: SiswaDaftar
+ },
+ {
+  path: '/siswaverifikasi',
+  name: 'SiswaVerifikasi',
+  component: SiswaVerifikasi
+ },
+ {
+  path: '/siswastatus',
+  name: 'SiswaStatus',
+  component: SiswaAkunStatus
+ },
+ {
+  path: '/siswastatusperbaikan',
+  name: 'SiswaStatusPerbaikan',
+  component: SiswaStatusPerbaikan
+ },
+ {
+  path: '/siswaditolak',
+  name: 'SiswaDitolak',
+  component: SiswaPengajuanDitolak
+ },
+ {
+  path: '/siswapanduan',
+  name: 'SiswaPanduan',
+  component: SiswaPanduan
+ },
+ {
+  path: '/siswaunggah',
+  name: 'SiswaUnggah',
+  component: SiswaUnggah
+ },
+ {
+  path: '/siswaberanda',
+  name: 'SiswaBeranda',
+  component: SiswaBeranda
+ },
+ 
 
   // contoh koneksi ke backend
   { path: '/home', name: 'Home', component: HomePage },

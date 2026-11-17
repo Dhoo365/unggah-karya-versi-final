@@ -21,7 +21,7 @@ export const juriProfile = {
   nip: '197805142003121002',
   org: 'UNIMA / Disdikbud Kota Manado',
   initials: 'TM',
-  photo: '', // isi dengan path foto, misalnya '/assets/juri/timothy.jpg'
+  photo: '/assets/moty.png', // foto juri (sama dengan versi mobile)
 };
 
 export const recap = [

@@ -174,14 +174,20 @@ export default function OnboardingPage() {
           </div>
 
           {isLast && (
-            <button
-              type="button"
-              onClick={() => navigate('/juri')}
-              className="mt-4 inline-flex w-fit items-center gap-2 self-end text-sm font-semibold text-secondary hover:underline"
-            >
-              <IoHammerOutline className="size-4" />
-              Masuk sebagai Dewan Juri
-            </button>
+            <div className="mt-4 flex flex-wrap justify-end gap-x-5 gap-y-2 text-sm font-semibold text-secondary">
+              {[
+                ['/juri', 'Masuk sebagai Dewan Juri'],
+                ['/guru', 'Portal Guru'],
+                ['/siswa', 'Portal Siswa'],
+                ['/daftar/guru', 'Daftar Akun Guru'],
+                ['/daftar/siswa', 'Daftar Akun Siswa'],
+              ].map(([to, label]) => (
+                <button key={to} type="button" onClick={() => navigate(to)} className="inline-flex items-center gap-1.5 hover:underline">
+                  {to === '/juri' && <IoHammerOutline className="size-4" />}
+                  {label}
+                </button>
+              ))}
+            </div>
           )}
         </div>
       </section>

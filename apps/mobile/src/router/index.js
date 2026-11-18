@@ -42,11 +42,14 @@ import SiswaValidasiSertifikat from '../views/Siswa/SiswaValidasiSertifikat.vue'
 import SiswaHasilLomba from '../views/Siswa/SiswaHasilLomba.vue';
 import SiswaProfil from '../views/Siswa/SiswaProfil.vue';
 import SiswaUbahSandi from '../views/Siswa/SiswaUbahSandi.vue';
-
-
-//Halaman Siswa
 import SiswaBeranda from '../views/Siswa/SiswaBeranda.vue';
 import SiswaUnggahKarya from '../views/Siswa/SiswaUnggahKarya.vue';
+
+// Pimpinan
+import EksekutifPage from '../views/Pimpinan/EksekutifPage.vue';
+import PantauLombaPage from '../views/Pimpinan/PantauLombaPage.vue';
+import PrestasiPage from '../views/Pimpinan/PrestasiPage.vue';
+import ProfilPimpinan from '../views/Pimpinan/ProfilPimpinan.vue';
 
 // Halaman contoh (tersambung ke backend)
 import HomePage from '@/views/HomePage.vue';
@@ -252,6 +255,27 @@ const routes = [
     component: SiswaValidasiSertifikat
   },
 
+  //Pimpinan
+  {
+    path: '/eksekutif',
+    name: 'Eksekutif',
+    component: EksekutifPage
+  },
+  {
+    path: '/pantaulomba',
+    name: 'PantauLomba',
+    component: PantauLombaPage
+  },
+  {
+    path: '/prestasi',
+    name: 'Prestasi',
+    component: PrestasiPage
+  },
+  {
+    path: '/profilpimpinan',
+    name: 'ProfilPimpinan',
+    component: ProfilPimpinan
+  },
 
   // contoh koneksi ke backend
   { path: '/home', name: 'Home', component: HomePage },

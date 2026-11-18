@@ -3,9 +3,11 @@ import { createRouter, createWebHistory } from '@ionic/vue-router';
 // Halaman onboarding
 import OnboardingPage from '@/views/OnboardingPage.vue';
 import OnBoardingSlide2 from '@/views/OnBoardingSlide2.vue';
+import OnBoardingSlide3 from '../views/OnBoardingSlide3.vue';
+import PilihAkunPage from '../views/PilihAkunPage.vue';
 
 // Halaman admin
-import AdminBeranda from '@/views/admin/AdminBeranda.vue';
+import AdminBeranda from '@/views/admin/AdminBeranda.vue';  
 import AdminPeserta from '@/views/admin/AdminPeserta.vue';
 import AdminJuri from '@/views/admin/AdminJuri.vue';
 import AdminKriteria from '@/views/admin/AdminKriteria.vue';
@@ -48,6 +50,7 @@ import SiswaUnggahKarya from '../views/Siswa/SiswaUnggahKarya.vue';
 
 // Halaman contoh (tersambung ke backend)
 import HomePage from '@/views/HomePage.vue';
+import LoginJuri from '../views/juri/LoginJuri.vue';
 
 const routes = [
   { path: '/', redirect: '/onboarding' },
@@ -62,6 +65,16 @@ const routes = [
     path: '/onboarding2', 
     name: 'OnboardingSlide2', 
     component: OnBoardingSlide2 
+  },
+  { 
+    path: '/onboarding3', 
+    name: 'OnboardingSlide3', 
+    component: OnBoardingSlide3
+  },
+  {
+    path: '/pilihakun',
+    name:'PilihAkunPage',
+    component: PilihAkunPage
   },
 
   // admin
@@ -111,6 +124,11 @@ const routes = [
     path: '/profiljuri',
     name: 'ProfilJuri',
     component: JuriProfil
+  },
+  {
+    path: '/loginjuri',
+    name: 'LoginJuri',
+    component: LoginJuri
   },
 
   // Guru

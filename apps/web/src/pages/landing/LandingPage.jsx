@@ -4,7 +4,6 @@ import JadwalSection from '../../components/landing/JadwalSection.jsx';
 import AlurSection from '../../components/landing/AlurSection.jsx';
 import PodiumSection from '../../components/landing/PodiumSection.jsx';
 import PeranSection from '../../components/landing/PeranSection.jsx';
-import FaqSection from '../../components/landing/FaqSection.jsx';
 import LandingFooter from '../../components/landing/LandingFooter.jsx';
 
 /*
@@ -22,7 +21,6 @@ export default function LandingPage() {
         <AlurSection />
         <PodiumSection />
         <PeranSection />
-        <FaqSection />
       </main>
       <LandingFooter />
     </div>

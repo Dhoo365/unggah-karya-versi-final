@@ -21,7 +21,6 @@ export default function PodiumSection() {
     <Reveal as="section" id="juara" className="mx-auto max-w-[1240px] scroll-mt-24 px-4 pt-20 sm:px-8 lg:pt-24">
       <div className="reveal mb-10 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <Eyebrow>Talenta Emas 2026</Eyebrow>
           <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-[44px] sm:leading-[1.1]">Podium tahun ini</h2>
         </div>
         <a href="#juara" className="inline-flex h-11 items-center gap-2 rounded-xl border-[1.5px] border-line bg-white px-5 text-sm font-bold text-navy hover:bg-surface">

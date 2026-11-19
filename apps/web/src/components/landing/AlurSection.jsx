@@ -15,7 +15,6 @@ export default function AlurSection() {
     <Reveal as="section" id="alur" className="mx-auto max-w-[1240px] scroll-mt-24 px-4 pt-20 sm:px-8 lg:pt-28">
       <div className="reveal mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <Eyebrow>Alur</Eyebrow>
           <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-[44px] sm:leading-[1.1]">Perjalanan sebuah karya</h2>
         </div>
         <p className="max-w-[380px] text-[15px] leading-relaxed text-muted sm:text-base">

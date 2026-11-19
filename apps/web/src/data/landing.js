@@ -53,5 +53,4 @@ export const navLinks = [
   { href: '#jadwal', label: 'Jadwal Lomba' },
   { href: '#alur', label: 'Alur' },
   { href: '#juara', label: 'Juara' },
-  { href: '#faq', label: 'FAQ' },
 ];

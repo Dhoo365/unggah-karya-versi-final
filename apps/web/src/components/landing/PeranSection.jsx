@@ -7,7 +7,6 @@ export default function PeranSection() {
   return (
     <Reveal as="section" className="mx-auto max-w-[1240px] px-4 pt-20 sm:px-8 lg:pt-24">
       <div className="reveal mb-10">
-        <Eyebrow>Untuk Siapa</Eyebrow>
         <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-[44px] sm:leading-[1.1]">Satu akun, sesuai peranmu</h2>
       </div>
 

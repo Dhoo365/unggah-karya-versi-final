@@ -9,7 +9,6 @@ export default function JadwalSection() {
     <Reveal as="section" id="jadwal" className="mx-auto max-w-[1240px] scroll-mt-24 px-4 pt-20 sm:px-8 lg:pt-24">
       <div className="reveal mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <Eyebrow>Jadwal Lomba</Eyebrow>
           <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-[44px] sm:leading-[1.1]">Yang sedang dan akan dibuka</h2>
         </div>
         <span className="hidden items-center gap-1.5 text-[15px] text-muted md:flex">

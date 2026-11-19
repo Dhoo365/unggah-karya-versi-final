@@ -14,7 +14,6 @@ export default function HeroSection() {
 
       <div className="relative mx-auto grid max-w-[1240px] items-center gap-6 px-4 sm:px-8 lg:grid-cols-[1fr_1.02fr]">
         <div className="hero-intro">
-          <Eyebrow>Sistem Unggah Karya Lomba</Eyebrow>
           <h1 className="mt-4 text-[40px] leading-[1.06] font-extrabold tracking-tight text-ink sm:text-[56px] xl:text-[64px]">
             Karya kamu layak dapat <InkCircle>panggung.</InkCircle>
           </h1>
@@ -29,20 +28,6 @@ export default function HeroSection() {
             <Link to="/onboarding" className="inline-flex h-12 items-center rounded-xl border-[1.5px] border-line bg-white px-6 text-[15px] font-bold text-navy hover:bg-surface">
               Baca Juknis
             </Link>
-          </div>
-
-          <div className="mt-10 flex flex-wrap items-center gap-3 text-sm font-semibold">
-            <span className="text-subtle">Sedang dibuka:</span>
-            {lombaDibuka.map((l) => (
-              <span key={l} className="sticker">
-                <i className="size-2 rounded-full bg-emerald-600" /> {l}
-              </span>
-            ))}
-            {lombaSegera.map((l) => (
-              <span key={l} className="sticker opacity-60">
-                <i className="size-2 rounded-full bg-line" /> {l}
-              </span>
-            ))}
           </div>
         </div>
 

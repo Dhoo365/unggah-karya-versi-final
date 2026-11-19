@@ -5,6 +5,17 @@ import Illustration from './Illustration.jsx';
 import { InkUnderline } from './Ink.jsx';
 import Reveal from './Reveal.jsx';
 
+// Tujuan tiap item di kolom footer
+const tautan = {
+  FLS2N: '#jadwal',
+  O2SN: '#jadwal',
+  'KIR & OSN': '#jadwal',
+  'LKS Vokasi': '#jadwal',
+  'Jadwal Lomba': '#jadwal',
+  Alur: '#alur',
+  'Papan Juara': '#juara',
+  'helpdesk@sikarya.id': 'mailto:helpdesk@sikarya.id',
+};
 const kolom = [
   { judul: 'LOMBA', isi: ['FLS2N', 'O2SN', 'KIR & OSN', 'LKS Vokasi'] },
   { judul: 'PLATFORM', isi: ['Jadwal Lomba', 'Alur', 'Papan Juara', 'Masuk Portal'] },
@@ -47,7 +58,15 @@ export default function LandingFooter() {
                 <h4 className="mb-4 text-[13px] font-bold tracking-[0.12em] text-white">{k.judul}</h4>
                 <ul className="space-y-2.5 text-sm">
                   {k.isi.map((x) => (
-                    <li key={x}>{x === 'Masuk Portal' ? <Link to="/onboarding" className="hover:text-white">{x}</Link> : x}</li>
+                    <li key={x}>
+                      {x === 'Masuk Portal' ? (
+                        <Link to="/onboarding" className="hover:text-white">{x}</Link>
+                      ) : tautan[x] ? (
+                        <a href={tautan[x]} className="transition-colors hover:text-white">{x}</a>
+                      ) : (
+                        x
+                      )}
+                    </li>
                   ))}
                 </ul>
               </div>

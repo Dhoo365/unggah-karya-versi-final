@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useUi } from '../../components/feedback/index.js';
+import { dokumen } from '../../data/dokumen.js';
 import {
   IoAlarmOutline,
   IoDocumentTextOutline,
@@ -23,6 +26,8 @@ const percent = (l) => Math.round((l.done / l.total) * 100);
 // Beranda portal Juri (versi mobile: JuriLombaTugas.vue)
 export default function LombaTugasPage() {
   const [filter, setFilter] = useState(lombaFilters[0]);
+  const navigate = useNavigate();
+  const ui = useUi();
 
   return (
     <div className="space-y-8">
@@ -130,7 +135,7 @@ export default function LombaTugasPage() {
                 </div>
               </div>
 
-              <Button className="mt-auto w-full" icon={l.ctaIcon}>Buka Antrean Karya Peserta</Button>
+              <Button className="mt-auto w-full" icon={l.ctaIcon} onClick={() => navigate('/juri/antrean')}>Buka Antrean Karya Peserta</Button>
             </Card>
           ))}
         </div>
@@ -148,7 +153,7 @@ export default function LombaTugasPage() {
         </p>
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
           <span className="text-xs font-medium text-subtle">Sekretariat Disdikbud Kota Manado</span>
-          <Button variant="outline" size="sm" icon={IoDownloadOutline}>Unduh Panduan Rubrik PDF</Button>
+          <Button variant="outline" size="sm" icon={IoDownloadOutline} onClick={() => ui.unduh(dokumen('Panduan Rubrik Penilaian Dewan Juri 2026', { jenis: 'nilai', label: 'Panduan Rubrik' }))}>Unduh Panduan Rubrik PDF</Button>
         </div>
       </section>
     </div>

@@ -24,6 +24,8 @@ import {
 } from '../../components/ui/index.js';
 import { cx, matchQuery } from '../../lib/cx.js';
 import { pesertaList, pesertaStats, pesertaTervalidasi, topTalenta } from '../../data/admin.js';
+import { useUi } from '../../components/feedback/index.js';
+import { dokumen } from '../../data/dokumen.js';
 
 // Status tampilan untuk setiap peserta di antrean
 const STATUS = {
@@ -40,8 +42,51 @@ export default function PesertaPage() {
   // { [id]: 'valid' | 'revisi' } — status hasil klik tombol
   const [statusMap, setStatusMap] = useState({});
 
+  const ui = useUi();
+  const [hanyaMenunggu, setHanyaMenunggu] = useState(false);
+  const [proses, setProses] = useState(null);
   const setStatus = (id, status) => setStatusMap((prev) => ({ ...prev, [id]: status }));
-  const daftar = pesertaList.filter((p) => matchQuery(p, query, ['nama', 'nisn', 'asal', 'lomba']));
+  const daftar = pesertaList.filter(
+    (p) => matchQuery(p, query, ['nama', 'nisn', 'asal', 'lomba']) && (!hanyaMenunggu || !statusMap[p.id])
+  );
+
+  const validasi = async (p) => {
+    setProses(p.id);
+    await new Promise((r) => setTimeout(r, 650)); // TODO: API pengesahan TTE
+    setProses(null);
+    setStatus(p.id, 'valid');
+    ui.toast({ title: 'Berkas disahkan', description: `${p.nama} • TTE BSrE dibubuhkan.` });
+  };
+  const mintaRevisi = async (p) => {
+    const alasan = await ui.confirm({
+      title: 'Minta revisi berkas',
+      message: `${p.nama} • ${p.lomba}`,
+      confirmLabel: 'Kirim Catatan Revisi',
+      tone: 'danger',
+      icon: IoCloseCircleOutline,
+      prompt: { label: 'Catatan untuk sekolah / siswa', placeholder: 'Contoh: Surat orisinalitas belum bermaterai.', min: 10, error: 'Tulis alasan minimal 10 karakter agar sekolah tahu yang harus diperbaiki.' },
+    });
+    if (alasan == null) return;
+    setStatus(p.id, 'revisi');
+    ui.toast({ title: 'Catatan revisi terkirim', description: `“${alasan}”`, tone: 'warning' });
+  };
+  const validasiMassal = async () => {
+    const sisa = pesertaList.filter((p) => !statusMap[p.id]);
+    if (!sisa.length) return ui.toast({ title: 'Tidak ada berkas menunggu', description: 'Semua berkas di halaman ini sudah diproses.', tone: 'info' });
+    const ok = await ui.confirm({
+      title: `Validasi ${sisa.length} berkas sekaligus?`,
+      message: 'Hanya berkas dengan status Dapodik terverifikasi yang akan disahkan.',
+      detail: sisa.map((p) => p.nama).join(', '),
+      confirmLabel: 'Validasi Semua',
+      icon: IoCheckmarkCircleOutline,
+      delay: 900,
+    });
+    if (!ok) return;
+    setStatusMap((m) => ({ ...m, ...Object.fromEntries(sisa.map((p) => [p.id, 'valid'])) }));
+    ui.toast({ title: `${sisa.length} berkas tervalidasi`, description: 'TTE BSrE dibubuhkan secara massal.' });
+  };
+  const lihatBerkas = (p, f) =>
+    ui.lihat(dokumen(f.nama.replace(/\.\w+$/, '').replace(/_/g, ' '), { label: 'Berkas Peserta', ukuran: f.size, namaFile: f.nama.replace(/\.\w+$/, '.pdf'), baris: [['Peserta', p.nama], ['NISN', p.nisn], ['Asal Sekolah', p.asal], ['Lomba', p.lomba], ['Judul Karya', p.judul]], bagian: [{ judul: 'Keterangan', isi: 'Pratinjau berkas yang diunggah peserta. Berkas asli dapat diunduh untuk diperiksa lebih lanjut.' }] }));
   // Total antrean 24 (data contoh), berkurang setiap ada yang divalidasi/ditolak
   const sudahDiproses = Object.values(statusMap).filter(Boolean).length;
   const menunggu = pesertaStats[0].value - sudahDiproses;
@@ -107,8 +152,8 @@ export default function PesertaPage() {
               action={
                 <div className="flex items-center gap-3">
                   <Pill tone="amber">{menunggu} Menunggu</Pill>
-                  <button type="button" className="inline-flex items-center gap-1 text-sm font-bold text-navy hover:underline">
-                    Lihat Semua <IoArrowForwardOutline className="size-4" />
+                  <button type="button" onClick={() => setHanyaMenunggu((v) => !v)} className="inline-flex items-center gap-1 text-sm font-bold text-navy hover:underline">
+                    {hanyaMenunggu ? 'Lihat Semua' : 'Hanya yang Menunggu'} <IoArrowForwardOutline className="size-4" />
                   </button>
                 </div>
               }
@@ -121,7 +166,7 @@ export default function PesertaPage() {
             {daftar.map((p) => {
               const st = STATUS[statusMap[p.id] ?? 'menunggu'];
               return (
-                <Card key={p.id} as="article" className="space-y-4">
+                <Card key={p.id} as="article" className="ui-enter space-y-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="flex items-start gap-3">
                       <Avatar initials={p.initial} tone={p.avatarTone} />
@@ -147,11 +192,11 @@ export default function PesertaPage() {
                     <p className="mt-2 text-sm text-muted italic">“{p.judul}”</p>
                     <div className="mt-3 grid gap-2 sm:grid-cols-2">
                       {p.files.map((f) => (
-                        <div key={f.nama} className="flex items-center gap-3 rounded-lg border border-line-soft bg-white px-3 py-2.5">
+                        <button key={f.nama} type="button" onClick={() => lihatBerkas(p, f)} title="Lihat berkas" className="ui-press flex items-center gap-3 rounded-lg border border-line-soft bg-white px-3 py-2.5 text-left hover:border-navy hover:bg-soft/30">
                           <f.icon className="size-5 shrink-0 text-navy" />
                           <span className="min-w-0 flex-1 truncate text-sm font-medium">{f.nama}</span>
                           <small className="text-xs text-subtle">{f.size}</small>
-                        </div>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -170,11 +215,11 @@ export default function PesertaPage() {
                       </Button>
                     ) : (
                       <div className="flex flex-wrap gap-2">
-                        <Button variant="danger" size="sm" icon={IoCloseCircleOutline} onClick={() => setStatus(p.id, 'revisi')}>
+                        <Button variant="danger" size="sm" icon={IoCloseCircleOutline} disabled={proses === p.id} onClick={() => mintaRevisi(p)}>
                           Minta Revisi / Tolak
                         </Button>
-                        <Button size="sm" icon={IoCheckmarkCircleOutline} onClick={() => setStatus(p.id, 'valid')}>
-                          Validasi & Sahkan TTE
+                        <Button size="sm" icon={IoCheckmarkCircleOutline} loading={proses === p.id} onClick={() => validasi(p)}>
+                          {proses === p.id ? 'Mengesahkan...' : 'Validasi & Sahkan TTE'}
                         </Button>
                       </div>
                     )}
@@ -204,7 +249,7 @@ export default function PesertaPage() {
               </div>
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <span className="text-xs text-subtle">Diarsipkan di SIM-Prestasi Sulut</span>
-                <Button variant="outline" size="sm" icon={IoDownloadOutline}>Unduh E-Sertifikat</Button>
+                <Button variant="outline" size="sm" icon={IoDownloadOutline} onClick={() => ui.unduh(dokumen(`E-Sertifikat ${pesertaTervalidasi.nama}`, { jenis: 'sertifikat', nomor: 'MND-CERT-88102', baris: [['Nama', pesertaTervalidasi.nama], ['Asal', pesertaTervalidasi.asal], ['Lomba', pesertaTervalidasi.lomba]] }))}>Unduh E-Sertifikat</Button>
               </div>
             </Card>
           </div>
@@ -222,7 +267,7 @@ export default function PesertaPage() {
                 </div>
                 <Pill tone="blue">Seleksi Nasional</Pill>
               </div>
-              <div className="flex items-center gap-3 rounded-xl bg-gradient-to-r from-amber-50 to-white p-3 ring-1 ring-amber-200">
+              <button type="button" onClick={() => navigate('/admin/talenta')} className="ui-press flex w-full items-center gap-3 rounded-xl bg-gradient-to-r from-amber-50 to-white p-3 text-left ring-1 ring-amber-200 hover:ring-amber-300">
                 <div className="grid size-10 place-items-center rounded-xl bg-gold text-sm font-extrabold text-gold-ink">
                   #{topTalenta.rank}
                 </div>
@@ -234,7 +279,7 @@ export default function PesertaPage() {
                   <strong className="text-lg font-extrabold text-navy">{topTalenta.skor}</strong>
                   <small className="text-xs text-subtle">/100</small>
                 </div>
-              </div>
+              </button>
             </Card>
 
             <Card className="flex items-start gap-4 bg-soft/40">
@@ -247,8 +292,8 @@ export default function PesertaPage() {
               </div>
             </Card>
 
-            <Button size="lg" className="w-full" icon={IoCheckmarkCircleOutline}>
-              Validasi Massal
+            <Button size="lg" className="w-full" icon={IoCheckmarkCircleOutline} onClick={validasiMassal}>
+              Validasi Massal ({menunggu})
             </Button>
           </aside>
         </div>

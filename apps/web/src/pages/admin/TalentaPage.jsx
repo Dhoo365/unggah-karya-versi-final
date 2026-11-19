@@ -24,6 +24,22 @@ import {
 } from '../../components/ui/index.js';
 import { cx, matchQuery } from '../../lib/cx.js';
 import { talentaFilters, talentaList, talentaStats } from '../../data/admin.js';
+import { Dropdown, useUi } from '../../components/feedback/index.js';
+import { IoChevronDownOutline, IoGridOutline, IoLockClosedOutline, IoSwapVerticalOutline } from 'react-icons/io5';
+import { dokumen } from '../../data/dokumen.js';
+
+const bidangFilter = { 1: /seni|tari|desain|budaya|musik/i, 2: /sains|robot|kir|ilmiah|maritim/i };
+const urutan = [
+  { label: 'Skor Tertinggi', fn: (a, b) => b.score - a.score },
+  { label: 'Skor Terendah', fn: (a, b) => a.score - b.score },
+  { label: 'Nama A–Z', fn: (a, b) => a.name.localeCompare(b.name) },
+];
+const rapor = (t) =>
+  dokumen(`Rapor Prestasi ${t.name}`, {
+    jenis: 'rekap',
+    label: 'Rapor Prestasi',
+    baris: [['Nama', t.name], ['Sekolah', t.school], ['Peringkat Kota', `#${t.rank}`], ['Skor Kurasi', `${t.score} / 100`], ['Bidang', t.bidang.replace('Bidang ', '')], ['Status', t.badge]],
+  });
 
 // Warna lencana peringkat
 const rankStyle = {
@@ -43,7 +59,42 @@ export default function TalentaPage() {
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState(talentaFilters[0]);
 
-  const daftar = talentaList.filter((t) => matchQuery(t, query, ['name', 'school', 'bidang']));
+  const ui = useUi();
+  const [urut, setUrut] = useState(0);
+  const [final, setFinal] = useState(false);
+  const idx = talentaFilters.indexOf(filter);
+  const daftar = talentaList
+    .filter((t) => matchQuery(t, query, ['name', 'school', 'bidang']) && (!bidangFilter[idx] || bidangFilter[idx].test(t.bidang)))
+    .sort(urutan[urut].fn);
+
+  const finalisasi = async () => {
+    if (final) return ui.toast({ title: 'Daftar sudah difinalisasi', description: 'Hubungi Dinas Provinsi untuk membuka kunci.', tone: 'info' });
+    const ok = await ui.confirm({
+      title: 'Finalisasi daftar talenta?',
+      message: 'Peringkat dikunci dan dikirim ke Dinas Pendidikan Provinsi untuk seleksi kontingen.',
+      confirmLabel: 'Kunci & Kirim',
+      icon: IoLockClosedOutline,
+      delay: 800,
+    });
+    if (!ok) return;
+    setFinal(true);
+    ui.toast({ title: 'Daftar talenta difinalisasi', description: `${talentaList.length} talenta dikunci untuk seleksi provinsi.` });
+  };
+  const piagam = async () => {
+    const ok = await ui.confirm({
+      title: 'Terbitkan piagam apresiasi?',
+      message: `Piagam Kadis untuk ${Math.min(10, talentaList.length)} talenta teratas akan dibubuhi TTE dan dikirim ke sekolah.`,
+      confirmLabel: 'Terbitkan Piagam',
+      tone: 'success',
+      icon: IoPersonOutline,
+      delay: 900,
+    });
+    if (ok) ui.toast({ title: 'Piagam apresiasi diterbitkan', description: 'Sekolah menerima notifikasi untuk mengunduh piagam.' });
+  };
+  const eksporPdf = () =>
+    ui.unduh(dokumen('Rekap Kurasi Talenta Daerah Kota Manado 2026', { jenis: 'rekap', baris: daftar.map((t) => [`#${t.rank} ${t.name}`, `${t.school} • ${t.score}`]) }));
+  const eksporExcel = () =>
+    ui.csv('Kurasi_Talenta_Manado_2026.csv', ['Peringkat', 'Nama', 'Sekolah', 'Bidang', 'Skor', 'Status'], daftar.map((t) => [t.rank, t.name, t.school, t.bidang, t.score, t.badge]));
 
   return (
     <div className="space-y-8">
@@ -63,8 +114,8 @@ export default function TalentaPage() {
           <span className="inline-flex items-center gap-2 text-sm text-white/85">
             <IoSchoolOutline className="size-5 text-gold" /> Dikda Sulut & Disdikbud Manado
           </span>
-          <button type="button" className="inline-flex items-center gap-1.5 text-sm font-bold hover:underline">
-            Tahap Finalisasi <IoArrowForwardOutline className="size-4" />
+          <button type="button" onClick={finalisasi} className="inline-flex items-center gap-1.5 text-sm font-bold hover:underline">
+            {final ? <><IoLockClosedOutline className="size-4" /> Telah Difinalisasi</> : <>Tahap Finalisasi <IoArrowForwardOutline className="size-4" /></>}
           </button>
         </div>
       </section>
@@ -93,9 +144,14 @@ export default function TalentaPage() {
           <SectionHeader
             title="Daftar Talenta Teratas"
             action={
-              <button type="button" className="text-sm font-bold text-navy hover:underline">
-                Urutkan: Skor Tertinggi
-              </button>
+              <Dropdown
+                items={urutan.map((u, i) => ({ label: u.label, icon: i === urut ? IoSwapVerticalOutline : undefined, onClick: () => setUrut(i) }))}
+                trigger={({ toggle, open }) => (
+                  <button type="button" onClick={toggle} aria-expanded={open} className="inline-flex items-center gap-1 text-sm font-bold text-navy hover:underline">
+                    Urutkan: {urutan[urut].label} <IoChevronDownOutline className={cx('size-4 transition-transform', open && 'rotate-180')} />
+                  </button>
+                )}
+              />
             }
           />
 
@@ -106,7 +162,7 @@ export default function TalentaPage() {
           {daftar.map((t) => {
             const top = t.rank === 1;
             return (
-              <Card key={t.name} as="article" className={cx('space-y-4', top && 'border-amber-300 ring-2 ring-amber-100')}>
+              <Card key={t.name} as="article" className={cx('ui-enter space-y-4', top && 'border-amber-300 ring-2 ring-amber-100')}>
                 <div className="flex flex-wrap items-center gap-4">
                   <div className={cx('grid size-12 shrink-0 place-items-center rounded-xl text-base font-extrabold', rankStyle[t.rankTone])}>
                     #{t.rank}
@@ -137,13 +193,13 @@ export default function TalentaPage() {
                 <div className="flex flex-wrap justify-end gap-2">
                   {top ? (
                     <>
-                      <Button variant="soft" size="sm" icon={IoDownloadOutline}>Unduh Rapor Prestasi</Button>
-                      <Button size="sm" icon={IoEyeOutline}>Lihat Portofolio</Button>
+                      <Button variant="soft" size="sm" icon={IoDownloadOutline} onClick={() => ui.unduh(rapor(t))}>Unduh Rapor Prestasi</Button>
+                      <Button size="sm" icon={IoEyeOutline} onClick={() => ui.lihat({ ...rapor(t), judul: `Portofolio ${t.name}`, jenis: 'Portofolio Talenta' })}>Lihat Portofolio</Button>
                     </>
                   ) : (
                     <>
-                      <Button variant="ghost" size="sm">Detail Berkas</Button>
-                      <Button variant={t.rankTone === 'plain' ? 'gray' : 'soft'} size="sm" icon={IoDocumentTextOutline}>
+                      <Button variant="ghost" size="sm" onClick={() => ui.lihat({ ...rapor(t), judul: `Berkas ${t.name}`, jenis: 'Detail Berkas' })}>Detail Berkas</Button>
+                      <Button variant={t.rankTone === 'plain' ? 'gray' : 'soft'} size="sm" icon={IoDocumentTextOutline} onClick={() => ui.unduh(rapor(t))}>
                         Rapor Prestasi
                       </Button>
                     </>
@@ -163,10 +219,20 @@ export default function TalentaPage() {
             <p className="text-sm leading-relaxed text-white/75">
               Proses sinkronisasi langsung ke sistem Dinas Pendidikan Daerah Provinsi Sulawesi Utara.
             </p>
-            <Button variant="white" className="h-auto w-full py-3 text-left whitespace-normal" icon={IoShareOutline}>
-              Ekspor Kurasi Talenta ke Dinas Provinsi (PDF/Excel)
-            </Button>
-            <Button variant="gold" className="w-full" icon={IoPersonOutline}>
+            <Dropdown
+              align="left"
+              panelClassName="w-full p-1.5"
+              items={[
+                { label: 'Ekspor PDF (Rekap Resmi)', icon: IoDocumentTextOutline, onClick: eksporPdf },
+                { label: 'Ekspor Excel (CSV)', icon: IoGridOutline, onClick: eksporExcel },
+              ]}
+              trigger={({ toggle }) => (
+                <Button variant="white" className="h-auto w-full py-3 text-left whitespace-normal" icon={IoShareOutline} iconRight={IoChevronDownOutline} onClick={toggle}>
+                  Ekspor Kurasi Talenta ke Dinas Provinsi (PDF/Excel)
+                </Button>
+              )}
+            />
+            <Button variant="gold" className="w-full" icon={IoPersonOutline} onClick={piagam}>
               Terbitkan Piagam Apresiasi Kadis
             </Button>
           </div>

@@ -1,4 +1,5 @@
 import { Route, Routes } from 'react-router-dom';
+import { FeedbackProvider } from './components/feedback/index.js';
 import { IoCheckmarkCircleOutline, IoSettingsOutline, IoStatsChartOutline } from 'react-icons/io5';
 
 import AdminLayout from './layouts/AdminLayout.jsx';
@@ -68,6 +69,8 @@ import AboutPage from './pages/AboutPage.jsx';
 */
 export default function App() {
   return (
+    // FeedbackProvider: toast, dialog konfirmasi, dan pratinjau dokumen untuk semua halaman
+    <FeedbackProvider>
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/onboarding" element={<OnboardingPage />} />
@@ -138,5 +141,6 @@ export default function App() {
 
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
+    </FeedbackProvider>
   );
 }

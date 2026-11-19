@@ -11,6 +11,7 @@ import {
   IoRibbonOutline,
   IoTrophyOutline,
 } from 'react-icons/io5';
+import { notifikasi } from '../data/notifikasi.js';
 import DashboardLayout from '../components/layout/DashboardLayout.jsx';
 import { guruProfil } from '../data/guru.js';
 
@@ -50,7 +51,8 @@ export default function GuruLayout() {
       sections={sections}
       profile={guruProfil}
       footnote={{ left: guruProfil.org, right: 'Pendidik Aktif' }}
-      notifications={3}
+      notifications={notifikasi.guru}
+      profilePath="/guru/profil"
     />
   );
 }

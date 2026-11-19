@@ -15,12 +15,17 @@ import {
 import { Avatar, Button, Card, EmptyState, FilterChips, Pill } from '../../components/ui/index.js';
 import { cx } from '../../lib/cx.js';
 import { kategoriPengumuman, pengumuman } from '../../data/guru.js';
+import { useUi } from '../../components/feedback/index.js';
+import { dokumen } from '../../data/dokumen.js';
+import { KONTAK } from '../../lib/files.js';
 
 const badgeIcon = { edaran: IoPin, wajib: IoAlertCircle, teknis: IoVideocamOutline, hasil: IoTrophyOutline };
 
 // Pengumuman & surat edaran (versi mobile: GuruPengumuman.vue)
 export default function PengumumanPage() {
   const [aktif, setAktif] = useState(kategoriPengumuman[0].label);
+  const ui = useUi();
+  const surat = (p) => dokumen(p.judul, { jenis: 'surat', nomor: p.nomor?.replace(/^.*No: /, ''), penerbit: p.instansi, namaFile: p.berkas?.nama, ukuran: p.berkas?.ukuran });
   const key = kategoriPengumuman.find((k) => k.label === aktif)?.key;
   const tampil = pengumuman.filter((p) => key === 'semua' || p.kategori.includes(key));
 
@@ -40,7 +45,7 @@ export default function PengumumanPage() {
           {tampil.map((p) => {
             const Icon = badgeIcon[p.tipe];
             return (
-              <Card key={p.id} as="article" className={cx('flex flex-col gap-4', p.tersemat && 'border-navy/30 ring-2 ring-soft lg:col-span-2')}>
+              <Card key={p.id} as="article" className={cx('ui-enter flex flex-col gap-4', p.tersemat && 'border-navy/30 ring-2 ring-soft lg:col-span-2')}>
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <Pill tone={p.tone} icon={Icon}>{p.badge}</Pill>
                   <time className="inline-flex items-center gap-1 text-xs text-subtle"><IoCalendarOutline className="size-3.5" />{p.tanggal}</time>
@@ -64,15 +69,15 @@ export default function PengumumanPage() {
                       <b className="block truncate text-sm font-semibold text-ink">{p.berkas.nama}</b>
                       <small className="text-xs text-subtle">Dokumen Resmi • {p.berkas.ukuran}</small>
                     </span>
-                    <Button size="sm" icon={IoDownloadOutline}>Unduh</Button>
+                    <Button size="sm" icon={IoDownloadOutline} onClick={() => ui.unduh(surat(p))}>Unduh</Button>
                   </div>
                 )}
                 <div className="mt-auto flex flex-wrap items-center gap-2">
-                  {p.tipe === 'wajib' && <Button variant="outline" size="sm" icon={IoDocumentTextOutline}>Lihat Format & Template</Button>}
+                  {p.tipe === 'wajib' && <Button variant="outline" size="sm" icon={IoDocumentTextOutline} onClick={() => ui.lihat(dokumen('Format Surat Pernyataan Orisinalitas Karya', { label: 'Template', bagian: [{ isi: 'Yang bertanda tangan di bawah ini, Kepala Sekolah ......, menyatakan bahwa karya berjudul ...... merupakan hasil orisinal peserta didik kami dan belum pernah dilombakan.' }, { judul: 'Lampiran wajib', isi: ['Sinopsis karya (maks. 300 kata).', 'Meterai Rp10.000 dan tanda tangan Kepala Sekolah.', 'Stempel basah sekolah asal.'] }] }))}>Lihat Format & Template</Button>}
                   {p.tipe === 'teknis' && (
                     <>
-                      <Button variant="soft" size="sm" icon={IoVideocamOutline}>Tautan Zoom</Button>
-                      <Button variant="outline" size="sm" icon={IoNewspaperOutline}>Notulensi</Button>
+                      <Button variant="soft" size="sm" icon={IoVideocamOutline} onClick={() => ui.buka('https://zoom.us/join', 'Membuka Zoom')}>Tautan Zoom</Button>
+                      <Button variant="outline" size="sm" icon={IoNewspaperOutline} onClick={() => ui.lihat(dokumen(`Notulensi ${p.judul}`, { label: 'Notulensi Rapat', bagian: [{ judul: 'Ringkasan', isi: p.isi }, { judul: 'Keputusan', isi: ['Rubrik 5 cabang lomba disepakati.', 'Bimtek lanjutan dijadwalkan bulan depan.', 'Materi presentasi dibagikan melalui portal.'] }] }))}>Notulensi</Button>
                     </>
                   )}
                   {p.tipe === 'hasil' && (
@@ -83,7 +88,7 @@ export default function PengumumanPage() {
                         </span>
                         <small className="text-xs text-muted">{p.wilayah}</small>
                       </span>
-                      <Button variant="ghost" size="sm" iconRight={IoArrowForwardOutline}>Buka Daftar</Button>
+                      <Button variant="ghost" size="sm" iconRight={IoArrowForwardOutline} onClick={() => ui.lihat(dokumen(p.judul, { jenis: 'rekap', label: 'Daftar Nominasi', baris: [['SMAN 1 Manado', 'Video Animasi Edukasi Bahari Bunaken'], ['SMKN 2 Bitung', 'Robot Pemilah Sampah Pesisir'], ['SMAN 1 Tomohon', 'Kriya Anyam Bambu Minahasa'], ['…', 'dan 117 karya lainnya']] }))}>Buka Daftar</Button>
                     </div>
                   )}
                 </div>

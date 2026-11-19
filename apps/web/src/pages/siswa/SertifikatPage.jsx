@@ -15,6 +15,50 @@ import {
 import { Button, Card, Pill, SectionHeader } from '../../components/ui/index.js';
 import { Checkbox, Field, FilePicker, SelectInput, TextInput, scrollToFirstError } from '../../components/form/index.js';
 import { cx } from '../../lib/cx.js';
+import { Modal, useUi } from '../../components/feedback/index.js';
+import { dokumen } from '../../data/dokumen.js';
+import { siswaProfil } from '../../data/siswa.js';
+
+/* ---------- Unggah ulang berkas revisi ---------- */
+function UnggahUlangModal({ item, onClose, onKirim }) {
+  const [file, setFile] = useState(null);
+  const [pesan, setPesan] = useState('');
+  const [dicoba, setDicoba] = useState(false);
+  const [proses, setProses] = useState(false);
+  const err = pesan || (dicoba && !file ? 'Pilih berkas SK / legalisir terlebih dulu.' : '');
+  return (
+    <Modal
+      open={!!item}
+      onClose={onClose}
+      icon={IoCloudUploadOutline}
+      tone="red"
+      title="Unggah Ulang Berkas"
+      subtitle={item?.judul}
+      footer={
+        <>
+          <Button variant="ghost" onClick={onClose}>Batal</Button>
+          <Button icon={IoCloudUploadOutline} loading={proses} onClick={async () => {
+            setDicoba(true);
+            if (!file || pesan) return;
+            setProses(true);
+            await new Promise((r) => setTimeout(r, 700)); // TODO: unggah ke API
+            setProses(false);
+            onKirim(item, file);
+            setFile(null); setDicoba(false);
+          }}>Kirim Perbaikan</Button>
+        </>
+      }
+    >
+      <div className="space-y-4">
+        <p className="rounded-xl border border-red-200 bg-red-50/60 p-3 text-sm text-ink">
+          <b className="block text-red-800">Catatan validator:</b> “{item?.catatan}”
+        </p>
+        <FilePicker file={file} onPick={(f, m) => { setFile(f); setPesan(m); }} accept={FORMAT} maxMB={5} error={err} title="Pilih SK Penetapan / Legalisir" hint="PDF/JPG/PNG • Maks. 5 MB" readyLabel="Siap dikirim" />
+        {err && <small className="block text-xs font-medium text-red-600">{err}</small>}
+      </div>
+    </Modal>
+  );
+}
 
 const tingkatList = [
   { value: 'Tingkat Kota Manado', icon: IoShieldCheckmarkOutline },
@@ -45,6 +89,28 @@ export default function SertifikatPage() {
   const [dicoba, setDicoba] = useState(false);
   const [daftar, setDaftar] = useState(pengajuanAwal);
   const [terkirim, setTerkirim] = useState(false);
+  const [mengirim, setMengirim] = useState(false);
+  const [ulang, setUlang] = useState(null);
+  const ui = useUi();
+  const lihatSertifikat = (item) =>
+    ui.lihat(dokumen(`Sertifikat ${item.judul}`, { jenis: 'sertifikat', nomor: item.nomorBsre, penerbit: item.penyelenggara, baris: [['Nama', siswaProfil.name], ['NISN', siswaProfil.nisn], ['Prestasi', item.judul], ['Tingkat', item.tingkat]] }));
+  const detailCatatan = async (item) => {
+    const ok = await ui.confirm({
+      title: 'Catatan Validator',
+      message: `${item.judul} • ${item.tanggal}`,
+      detail: (
+        <div className="space-y-2">
+          <p className="text-ink">“{item.catatan}”</p>
+          <p className="text-xs">Langkah: minta SK Penetapan Pemenang dari Disdikbud Kota Manado atau legalisir Kepala Sekolah, lalu unggah ulang sebelum 7 hari kerja.</p>
+        </div>
+      ),
+      icon: IoAlertCircleOutline,
+      confirmLabel: 'Unggah Ulang Sekarang',
+      cancelLabel: 'Tutup',
+      delay: 0,
+    });
+    if (ok) setUlang(item);
+  };
 
   const errors = {
     nama: form.nama.trim().length >= 5 ? '' : 'Nama prestasi wajib diisi (minimal 5 karakter).',
@@ -55,10 +121,14 @@ export default function SertifikatPage() {
   const err = (k) => (dicoba ? errors[k] : k === 'berkas' ? pesanBerkas : '');
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e?.target ? e.target.value : e }));
 
-  const kirim = (e) => {
+  const kirim = async (e) => {
     e.preventDefault();
+    if (mengirim) return;
     setDicoba(true);
     if (Object.values(errors).some(Boolean)) return scrollToFirstError();
+    setMengirim(true);
+    await new Promise((r) => setTimeout(r, 800));
+    setMengirim(false);
     // TODO: kirim ke API. Untuk sekarang langsung ditambahkan ke riwayat.
     setDaftar((d) => [
       { id: String(Date.now()), status: 'review', tanggal: 'Baru saja', judul: form.nama, tingkat: form.tingkat, penyelenggara: form.penyelenggara, estimasi: 'Estimasi: 1–3 hari kerja verifikasi', namaFile: berkas.name },
@@ -68,10 +138,20 @@ export default function SertifikatPage() {
     setBerkas(null);
     setDicoba(false);
     setTerkirim(true);
+    ui.toast({ title: 'Sertifikat terkirim', description: 'Masuk antrean peninjauan Admin Kota Manado.' });
   };
 
   return (
     <div className="space-y-8">
+      <UnggahUlangModal
+        item={ulang}
+        onClose={() => setUlang(null)}
+        onKirim={(item, file) => {
+          setDaftar((d) => d.map((x) => (x.id === item.id ? { ...x, status: 'review', tanggal: 'Baru saja', estimasi: 'Estimasi: 1–3 hari kerja verifikasi', namaFile: file.name } : x)));
+          setUlang(null);
+          ui.toast({ title: 'Perbaikan terkirim', description: 'Status berubah menjadi Sedang Ditinjau.' });
+        }}
+      />
       <div className="flex items-start gap-3 rounded-2xl border border-navy/15 bg-soft/40 p-5">
         <IoShieldCheckmarkOutline className="mt-0.5 size-6 shrink-0 text-navy" />
         <div>
@@ -138,7 +218,7 @@ export default function SertifikatPage() {
                 Saya menyatakan bahwa sertifikat ini sah dan asli. Pemalsuan dokumen dapat dikenakan sanksi diskualifikasi prestasi Dapodik.
               </Checkbox>
             </Field>
-            <Button type="submit" size="lg" icon={IoCloudUploadOutline} className="w-full">Kirim Sertifikat untuk Validasi</Button>
+            <Button type="submit" size="lg" icon={IoCloudUploadOutline} className="w-full" loading={mengirim}>{mengirim ? 'Mengirim Sertifikat...' : 'Kirim Sertifikat untuk Validasi'}</Button>
             <p className="text-center text-xs text-subtle">Pemeriksaan berkas oleh Admin Verifikator Kota Manado rata-rata 1–3 hari kerja.</p>
           </Card>
         </form>
@@ -149,7 +229,7 @@ export default function SertifikatPage() {
           {daftar.map((item) => {
             const st = statusInfo[item.status];
             return (
-              <Card key={item.id} as="article" className="space-y-3">
+              <Card key={item.id} as="article" className="ui-enter space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <Pill tone={st.tone} icon={st.icon}>{st.label}</Pill>
                   <small className="text-xs text-subtle">{item.tanggal}</small>
@@ -165,7 +245,7 @@ export default function SertifikatPage() {
                       <b className="block font-mono font-semibold text-ink">No. BSrE: {item.nomorBsre}</b>
                       <small className="text-xs text-emerald-800">Tervalidasi TTE Disdikbud Manado • Sinkron Dapodik</small>
                     </div>
-                    <Button variant="ghost" size="sm" icon={IoEyeOutline}>Lihat</Button>
+                    <Button variant="ghost" size="sm" icon={IoEyeOutline} onClick={() => lihatSertifikat(item)}>Lihat</Button>
                   </div>
                 )}
                 {item.status === 'review' && (
@@ -183,8 +263,8 @@ export default function SertifikatPage() {
                       <span className="text-ink">“{item.catatan}”</span>
                     </p>
                     <div className="flex flex-wrap gap-2">
-                      <Button variant="outline" size="sm">Detail Catatan</Button>
-                      <Button variant="danger" size="sm" icon={IoCloudUploadOutline}>Unggah Ulang SK</Button>
+                      <Button variant="outline" size="sm" onClick={() => detailCatatan(item)}>Detail Catatan</Button>
+                      <Button variant="danger" size="sm" icon={IoCloudUploadOutline} onClick={() => setUlang(item)}>Unggah Ulang SK</Button>
                     </div>
                   </div>
                 )}

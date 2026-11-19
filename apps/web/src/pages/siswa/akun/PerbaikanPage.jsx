@@ -10,6 +10,8 @@ import {
   IoTimeOutline,
 } from 'react-icons/io5';
 import AccountLayout from '../../../components/layout/AccountLayout.jsx';
+import { useUi } from '../../../components/feedback/index.js';
+import { KONTAK } from '../../../lib/files.js';
 import { Button, Card, Pill } from '../../../components/ui/index.js';
 import { Field, FilePicker, SelectInput, TextArea, scrollToFirstError } from '../../../components/form/index.js';
 import { pengajuanSiswa as siswa, rombelList, tiketPerbaikan as tiket } from '../../../data/siswaAkun.js';
@@ -19,6 +21,7 @@ const FORMAT = ['image/jpeg', 'image/png', 'application/pdf'];
 // Perbaikan data akun siswa (versi mobile: SiswaStatusPerbaikan.vue)
 export default function PerbaikanPage() {
   const navigate = useNavigate();
+  const ui = useUi();
   const [rombel, setRombel] = useState('');
   const [catatan, setCatatan] = useState('');
   const [berkas, setBerkas] = useState(null);
@@ -115,7 +118,7 @@ export default function PerbaikanPage() {
               Data perbaikan yang dikirim ulang akan masuk prioritas antrean kurasi verifikator dalam waktu 1×24 jam kerja.
             </p>
             <Button type="submit" size="lg" className="w-full" icon={IoSendOutline}>Kirim Ulang Perbaikan</Button>
-            <Button variant="ghost" className="w-full" icon={IoHelpCircleOutline}>Bantuan / Hubungi Guru Pembimbing</Button>
+            <Button variant="ghost" className="w-full" onClick={() => ui.buka(KONTAK.waHelpdesk, 'WhatsApp dibuka')} icon={IoHelpCircleOutline}>Bantuan / Hubungi Guru Pembimbing</Button>
           </Card>
         </form>
       </div>

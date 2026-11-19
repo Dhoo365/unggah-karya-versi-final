@@ -40,8 +40,9 @@ export const antrean = [
   {
     no: '02', lomba: 'FLS2N Tari Kreasi', tagIcon: IoRadioButtonOnOutline, status: 'draft', statusLabel: 'Draf Tersimpan',
     title: 'Harmoni Danau Tondano & Teluk Manado', name: 'Kezia Wenas', school: 'SMKN 1 Manado',
+    nilai: { Wiraga: 82, Wirama: 78, Wirasa: 76 }, // nilai draf yang sudah diisi
     progress: {
-      filled: 3, total: 4, score: '78.50',
+      filled: 3, total: 4, score: '63.20',
       criteria: [
         { name: 'Wiraga', done: true },
         { name: 'Wirama', done: true },

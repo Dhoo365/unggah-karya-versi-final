@@ -13,6 +13,8 @@ import {
   IoShieldCheckmarkOutline,
 } from 'react-icons/io5';
 import AccountLayout, { StepList } from '../../../components/layout/AccountLayout.jsx';
+import { useUi } from '../../../components/feedback/index.js';
+import { KONTAK } from '../../../lib/files.js';
 import { Button, Card, Pill } from '../../../components/ui/index.js';
 import { Checkbox, Field, PasswordInput, RadioCards, SelectInput, Step, StrengthMeter, TextInput, scrollToFirstError } from '../../../components/form/index.js';
 import { cabdinList, jenjangSiswa, tahapanVerifikasi } from '../../../data/siswaAkun.js';
@@ -43,6 +45,20 @@ export default function DaftarPage() {
   const [touched, setTouched] = useState({});
   const [dicoba, setDicoba] = useState(false);
   const [mengirim, setMengirim] = useState(false);
+  const [mengecek, setMengecek] = useState(false);
+  const ui = useUi();
+  // Cek NISN ke Dapodik (contoh). TODO: ganti dengan API Dapodik/Verval PD.
+  const cekDapodik = async () => {
+    if (!/^\d{10}$/.test(form.nisn)) {
+      setTouched((t) => ({ ...t, nisn: true }));
+      return ui.toast({ title: 'NISN belum lengkap', description: 'Masukkan 10 digit NISN terlebih dahulu.', tone: 'warning' });
+    }
+    setMengecek(true);
+    await new Promise((r) => setTimeout(r, 900));
+    setMengecek(false);
+    setForm((f) => ({ ...f, nama: f.nama || 'Christian Tatengkeng', sekolah: f.sekolah || 'SMAN 1 Manado' }));
+    ui.toast({ title: 'NISN ditemukan di Dapodik', description: 'Nama dan sekolah terisi otomatis. Periksa kembali sebelum mendaftar.' });
+  };
 
   const errors = useMemo(() => validasi(form), [form]);
   const err = (k) => (touched[k] || dicoba ? errors[k] : '');
@@ -105,8 +121,9 @@ export default function DaftarPage() {
               onBlur={blur('nisn')}
               error={err('nisn')}
               trailing={
-                <button type="button" className="shrink-0 rounded-lg bg-soft px-3 py-1.5 text-xs font-bold text-navy hover:bg-ice">
-                  Cek Dapodik
+                <button type="button" onClick={cekDapodik} disabled={mengecek} className="ui-press inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-soft px-3 py-1.5 text-xs font-bold text-navy hover:bg-ice disabled:opacity-70">
+                  {mengecek && <i className="size-3 animate-spin rounded-full border-2 border-current border-r-transparent" />}
+                  {mengecek ? 'Mengecek...' : 'Cek Dapodik'}
                 </button>
               }
             />

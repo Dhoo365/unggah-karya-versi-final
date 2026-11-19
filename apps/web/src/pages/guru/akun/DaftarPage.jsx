@@ -14,6 +14,8 @@ import {
   IoShieldCheckmarkOutline,
 } from 'react-icons/io5';
 import AccountLayout, { StepList } from '../../../components/layout/AccountLayout.jsx';
+import { useUi } from '../../../components/feedback/index.js';
+import { KONTAK } from '../../../lib/files.js';
 import { Button, Card, Pill } from '../../../components/ui/index.js';
 import { Checkbox, Field, FilePicker, PasswordInput, SelectInput, Step, StrengthMeter, TextInput, scrollToFirstError } from '../../../components/form/index.js';
 import { cabangDinasList, tahapanVerifikasiGuru } from '../../../data/guruAkun.js';
@@ -48,6 +50,20 @@ export default function DaftarPage() {
   const [touched, setTouched] = useState({});
   const [dicoba, setDicoba] = useState(false);
   const [mengirim, setMengirim] = useState(false);
+  const [mengecek, setMengecek] = useState(false);
+  const ui = useUi();
+  // Validasi NUPTK ke GTK Dapodik (contoh). TODO: ganti dengan API resmi.
+  const cekDapodik = async () => {
+    if (!/^\d{16}$/.test(form.nuptk)) {
+      setTouched((t) => ({ ...t, nuptk: true }));
+      return ui.toast({ title: 'NUPTK belum lengkap', description: 'Masukkan 16 digit NUPTK / PegID terlebih dahulu.', tone: 'warning' });
+    }
+    setMengecek(true);
+    await new Promise((r) => setTimeout(r, 900));
+    setMengecek(false);
+    setForm((f) => ({ ...f, nama: f.nama || 'Dra. Meiske Lumintang, M.Pd', sekolah: f.sekolah || 'SMA Negeri 1 Manado' }));
+    ui.toast({ title: 'NUPTK aktif di GTK Dapodik', description: 'Nama dan unit kerja terisi otomatis.' });
+  };
 
   const errors = useMemo(() => validasi(form, berkas, pesanBerkas), [form, berkas, pesanBerkas]);
   const err = (k) => (touched[k] || dicoba || (k === 'berkas' && pesanBerkas) ? errors[k] : '');
@@ -107,7 +123,12 @@ export default function DaftarPage() {
               onChange={set('nuptk')}
               onBlur={blur('nuptk')}
               error={err('nuptk')}
-              trailing={<button type="button" className="shrink-0 rounded-lg bg-soft px-3 py-1.5 text-xs font-bold text-navy hover:bg-ice">Validasi Dapodik</button>}
+              trailing={
+                <button type="button" onClick={cekDapodik} disabled={mengecek} className="ui-press inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-soft px-3 py-1.5 text-xs font-bold text-navy hover:bg-ice disabled:opacity-70">
+                  {mengecek && <i className="size-3 animate-spin rounded-full border-2 border-current border-r-transparent" />}
+                  {mengecek ? 'Mengecek...' : 'Validasi Dapodik'}
+                </button>
+              }
             />
           </Field>
           <div className="grid gap-5 md:grid-cols-2">

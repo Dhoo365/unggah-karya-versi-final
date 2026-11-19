@@ -35,6 +35,20 @@ export const podium = [
 ];
 export const talentaLainnya = 39;
 
+// Papan juara lengkap (dibuka dari tombol "Papan Juara Lengkap")
+export const papanJuara = [
+  { rank: 1, nama: 'Alvaro G. Rumambi', sekolah: 'SMAN 9 Binsus Manado', bidang: 'Robotika Maritim', skor: '98,4' },
+  { rank: 2, nama: 'Clarissa Sompotan', sekolah: 'SMAN 1 Manado', bidang: 'Seni Tari Tradisi', skor: '96,2' },
+  { rank: 3, nama: 'Kezia Wenas', sekolah: 'SMKN 1 Manado', bidang: 'Animasi Budaya', skor: '94,8' },
+  { rank: 4, nama: 'Jonathan Mandey', sekolah: 'SMKN 2 Manado', bidang: 'Kriya Anyaman Bambu', skor: '93,6' },
+  { rank: 5, nama: 'Michelle Pangemanan', sekolah: 'SMKN 1 Manado', bidang: 'Desain Busana Bentenan', skor: '93,1' },
+  { rank: 6, nama: 'Kevin Pangkey', sekolah: 'SMA Negeri 1 Manado', bidang: 'Cipta Lagu & Musikalisasi', skor: '92,4' },
+  { rank: 7, nama: 'Gabriela Rondonuwu', sekolah: 'SMAN 1 Tomohon', bidang: 'KIR Lingkungan', skor: '91,7' },
+  { rank: 8, nama: 'Daniel Lumempouw', sekolah: 'SMAN 1 Bitung', bidang: 'O2SN Atletik', skor: '90,9' },
+  { rank: 9, nama: 'Angelica Tumbelaka', sekolah: 'SMAN 2 Manado', bidang: 'Monolog Bahasa Daerah', skor: '90,2' },
+  { rank: 10, nama: 'Rafael Sumual', sekolah: 'SMKN 3 Manado', bidang: 'Web Komersial (LKS)', skor: '89,8' },
+];
+
 export const peran = [
   { judul: 'Siswa', poin: ['Cari lomba sesuai jenjang', 'Unggah karya & pantau status', 'Unduh sertifikat'], miring: -2, latar: 'bg-white' },
   { judul: 'Guru Pembimbing', poin: ['Dampingi beberapa siswa', 'Setujui karya sebelum dikirim', 'Terima catatan revisi'], miring: 1.5, latar: 'bg-[#fff7e0]' },

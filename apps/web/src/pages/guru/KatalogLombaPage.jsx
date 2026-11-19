@@ -14,10 +14,14 @@ import {
 import { Button, Card, EmptyState, FilterChips, IconBox, Pill } from '../../components/ui/index.js';
 import { cx } from '../../lib/cx.js';
 import { guruProfil, jenjangLomba, katalogLomba } from '../../data/guru.js';
+import { useUi } from '../../components/feedback/index.js';
+import { dokumen } from '../../data/dokumen.js';
+import { KONTAK } from '../../lib/files.js';
 
 // Katalog lomba aktif (versi mobile: GuruKatalogLomba.vue)
 export default function KatalogLombaPage() {
   const navigate = useNavigate();
+  const ui = useUi();
   const [jenjang, setJenjang] = useState(jenjangLomba[0].label);
   const [diingatkan, setDiingatkan] = useState([]);
   const key = jenjangLomba.find((j) => j.label === jenjang)?.key;
@@ -27,7 +31,7 @@ export default function KatalogLombaPage() {
   const Aksi = ({ l }) => (
     <div className="flex flex-col gap-2">
       <Button icon={IoPersonAddOutline} className="w-full" onClick={() => navigate('/guru/unggah')}>Daftarkan Siswa</Button>
-      <Button variant="outline" icon={IoDownloadOutline} className="w-full">Unduh Juknis{l.ukuranJuknis ? ` (${l.ukuranJuknis})` : ''}</Button>
+      <Button variant="outline" icon={IoDownloadOutline} className="w-full" onClick={() => ui.unduh(dokumen(`Juknis ${l.judul}`, { jenis: 'juknis', ukuran: l.ukuranJuknis, baris: [['Batas', l.batas ?? '-'], ['Penyelenggara', 'Dinas Pendidikan Daerah Prov. Sulut']] }))}>Unduh Juknis{l.ukuranJuknis ? ` (${l.ukuranJuknis})` : ''}</Button>
     </div>
   );
 
@@ -108,7 +112,7 @@ export default function KatalogLombaPage() {
                     <IoDocumentTextOutline className="size-4 shrink-0 not-italic" /> {l.petunjuk}
                   </p>
                   <Button variant={ingat ? 'soft' : 'outline'} size="sm" icon={ingat ? IoCheckmarkCircle : IoNotificationsOutline} className="mt-auto"
-                    onClick={() => setDiingatkan((d) => (ingat ? d.filter((x) => x !== l.id) : [...d, l.id]))}>
+                    onClick={() => { setDiingatkan((d) => (ingat ? d.filter((x) => x !== l.id) : [...d, l.id])); ui.toast(ingat ? { title: 'Pengingat dimatikan', tone: 'info', durasi: 2500 } : { title: 'Pengingat aktif', description: `Kami akan memberi tahu saat ${l.judul} dibuka.` }); }}>
                     {ingat ? 'Pengingat Aktif' : 'Ingatkan Saya'}
                   </Button>
                 </>

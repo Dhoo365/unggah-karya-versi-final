@@ -8,6 +8,7 @@ import {
   IoSchoolOutline,
   IoShieldCheckmarkOutline,
 } from 'react-icons/io5';
+import { notifikasi } from '../data/notifikasi.js';
 import DashboardLayout from '../components/layout/DashboardLayout.jsx';
 import { siswaProfil } from '../data/siswa.js';
 
@@ -39,7 +40,8 @@ export default function SiswaLayout() {
       sections={sections}
       profile={siswaProfil}
       footnote={{ left: 'NISN ' + siswaProfil.nisn, right: 'Akun Aktif' }}
-      notifications={2}
+      notifications={notifikasi.siswa}
+      profilePath="/siswa/profil"
     />
   );
 }

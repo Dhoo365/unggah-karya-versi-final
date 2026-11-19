@@ -11,6 +11,9 @@ import {
 } from 'react-icons/io5';
 import { Button, Card, EmptyState, FilterChips, SearchBar, SectionHeader } from '../../components/ui/index.js';
 import { cx, matchQuery } from '../../lib/cx.js';
+import { useUi } from '../../components/feedback/index.js';
+import { dokumen } from '../../data/dokumen.js';
+import { KONTAK } from '../../lib/files.js';
 
 const kategori = [
   { id: 'semua', label: 'Semua' },
@@ -46,6 +49,7 @@ const faq = [
 // Pusat bantuan & panduan siswa (versi mobile: SiswaPanduan.vue)
 export default function PanduanPage() {
   const [cari, setCari] = useState('');
+  const ui = useUi();
   const [aktif, setAktif] = useState(kategori[0].label);
   const [buka, setBuka] = useState(1);
   const idAktif = kategori.find((k) => k.label === aktif)?.id;
@@ -68,7 +72,7 @@ export default function PanduanPage() {
             <span className="text-xs font-bold tracking-widest text-gold">BUKU SAKU SISWA 2025</span>
             <h2 className="mt-2 text-2xl font-extrabold">Panduan Praktis Siswa (PDF)</h2>
             <p className="mt-2 max-w-lg text-sm text-ice">Petunjuk teknis resmi pendaftaran, ketentuan berkas karya digital, dan tahapan verifikasi kurasi.</p>
-            <Button variant="gold" icon={IoDownloadOutline} className="mt-5">Unduh Juknis Lengkap (2.4 MB)</Button>
+            <Button variant="gold" icon={IoDownloadOutline} className="mt-5" onClick={() => ui.unduh(dokumen('Buku Saku Siswa SIKARYA 2025', { jenis: 'juknis', label: 'Panduan Siswa', bagian: alur.map((a, i) => ({ judul: `${i + 1}. ${a.judul}`, isi: a.isi })) }))}>Unduh Juknis Lengkap (2.4 MB)</Button>
           </section>
 
           {/* ---------- FAQ ---------- */}
@@ -89,7 +93,11 @@ export default function PanduanPage() {
                         {f.tanya}
                         <IoChevronDownOutline className={cx('size-5 shrink-0 text-subtle transition-transform', on && 'rotate-180')} />
                       </button>
-                      {on && <div className="px-5 pb-5 text-sm leading-relaxed text-muted">{f.jawab}</div>}
+                      <div className={cx('grid transition-[grid-template-rows] duration-300 ease-out', on ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]')}>
+                        <div className="overflow-hidden">
+                          <div className="px-5 pb-5 text-sm leading-relaxed text-muted">{f.jawab}</div>
+                        </div>
+                      </div>
                     </div>
                   );
                 })}
@@ -123,7 +131,7 @@ export default function PanduanPage() {
               <h2 className="text-base font-bold">Butuh bantuan lebih lanjut?</h2>
               <small className="text-sm text-muted">Tim helpdesk teknis Cabdin Manado siap membimbing kendala Anda.</small>
             </div>
-            <a href="https://wa.me/" target="_blank" rel="noreferrer" className="flex items-center gap-3 rounded-xl bg-emerald-50 p-3 hover:bg-emerald-100">
+            <a href={KONTAK.waHelpdesk} target="_blank" rel="noreferrer" className="ui-press flex items-center gap-3 rounded-xl bg-emerald-50 p-3 hover:bg-emerald-100">
               <IoLogoWhatsapp className="size-6 shrink-0 text-emerald-600" />
               <span className="min-w-0 flex-1">
                 <b className="block text-sm font-semibold text-ink">Chat WhatsApp Helpdesk</b>
@@ -131,7 +139,7 @@ export default function PanduanPage() {
               </span>
               <IoArrowForward className="size-4 text-emerald-700" />
             </a>
-            <a href="mailto:sikarya.dikdasulut@gmail.com" className="flex items-center gap-3 rounded-xl border border-line-soft p-3 hover:bg-surface">
+            <a href={KONTAK.emailHelpdesk} className="ui-press flex items-center gap-3 rounded-xl border border-line-soft p-3 hover:bg-surface">
               <IoMailOutline className="size-6 shrink-0 text-navy" />
               <span className="min-w-0 flex-1">
                 <b className="block text-sm font-semibold text-ink">Email Dukungan Resmi</b>

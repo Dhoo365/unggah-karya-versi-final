@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   IoChevronForwardOutline,
   IoDocumentTextOutline,
@@ -14,7 +14,10 @@ import {
 } from 'react-icons/io5';
 import { Avatar, Button, Card, IconBox, Pill, SectionHeader } from '../../components/ui/index.js';
 import { InfoList } from '../../components/layout/AccountLayout.jsx';
-import { siswaProfil } from '../../data/siswa.js';
+import { prestasi, siswaProfil } from '../../data/siswa.js';
+import { useUi } from '../../components/feedback/index.js';
+import { dokumen } from '../../data/dokumen.js';
+import { KONTAK } from '../../lib/files.js';
 
 const statistik = [
   { nilai: 3, label: 'Prestasi Kota Terverifikasi' },
@@ -32,7 +35,7 @@ const pembimbing = { initials: 'JR', nama: 'Dra. Johanis Runtuwene, M.Pd', info:
 const menu = [
   { to: '/siswa/ubah-sandi', icon: IoLockClosedOutline, judul: 'Keamanan & Ubah Kata Sandi', sub: 'Kata sandi akun portal siswa dan verifikasi dua faktor' },
   { to: '/siswa/panduan', icon: IoHelpBuoyOutline, judul: 'Pusat Bantuan & Panduan Siswa', sub: 'Tata cara pengunggahan berkas karya dan juknis lomba' },
-  { href: 'mailto:sikarya.dikdasulut@gmail.com', icon: IoHeadsetOutline, judul: 'Hubungi Admin / Operator Sekolah', sub: 'Layanan bantuan data Dapodik sekolah' },
+  { href: KONTAK.emailHelpdesk, icon: IoHeadsetOutline, judul: 'Hubungi Admin / Operator Sekolah', sub: 'Layanan bantuan data Dapodik sekolah' },
 ];
 
 function MenuRow({ item }) {
@@ -52,6 +55,14 @@ function MenuRow({ item }) {
 
 // Profil siswa (versi mobile: SiswaProfil.vue)
 export default function ProfilPage() {
+  const ui = useUi();
+  const navigate = useNavigate();
+  const keluar = async () => {
+    const ok = await ui.confirm({ title: 'Keluar dari akun SIKARYA?', message: 'Anda perlu masuk kembali untuk mengunggah karya.', confirmLabel: 'Ya, Keluar', tone: 'danger', icon: IoLogOutOutline });
+    if (!ok) return;
+    navigate('/onboarding');
+    ui.toast({ title: 'Anda telah keluar', tone: 'info' });
+  };
   return (
     <div className="space-y-8">
       {/* ---------- Kartu identitas ---------- */}
@@ -119,16 +130,14 @@ export default function ProfilPage() {
               <b className="block font-semibold text-ink">Cetak E-Portofolio Lengkap <Pill tone="blue" className="ml-1">BSrE</Pill></b>
               <small className="text-sm text-muted">Dokumen PDF resmi ber-barcode verifikasi Disdikbud Manado.</small>
             </div>
-            <Button size="sm" icon={IoDownloadOutline}>Unduh PDF</Button>
+            <Button size="sm" icon={IoDownloadOutline} onClick={() => ui.unduh(dokumen(`E-Portofolio ${siswaProfil.name}`, { jenis: 'rekap', label: 'E-Portofolio', baris: [['Nama', siswaProfil.name], ['NISN', siswaProfil.nisn], ['Sekolah', siswaProfil.org], ...prestasi.map((x) => [x.badge, `${x.judul} (${x.meta})`])] }))}>Unduh PDF</Button>
           </Card>
 
           <SectionHeader title="Pusat Bantuan & Pengaturan" className="pt-4" />
           <Card className="p-2">
             {menu.map((m) => <MenuRow key={m.judul} item={m} />)}
           </Card>
-          <Link to="/onboarding" className="block">
-            <Button variant="danger" icon={IoLogOutOutline} className="w-full">Keluar dari Akun SIKARYA</Button>
-          </Link>
+          <Button variant="danger" icon={IoLogOutOutline} className="w-full" onClick={keluar}>Keluar dari Akun SIKARYA</Button>
         </section>
       </div>
     </div>

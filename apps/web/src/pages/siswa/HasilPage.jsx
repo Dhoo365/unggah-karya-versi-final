@@ -13,6 +13,16 @@ import {
 import { Avatar, Button, Card, Pill } from '../../components/ui/index.js';
 import { cx } from '../../lib/cx.js';
 import { prestasi, siswaProfil } from '../../data/siswa.js';
+import { useUi } from '../../components/feedback/index.js';
+import { dokumen } from '../../data/dokumen.js';
+
+const sertifikat = (p) =>
+  dokumen(`E-Sertifikat ${p.badge} — ${p.judul}`, {
+    jenis: 'sertifikat',
+    nomor: `SKR-${p.meta.replace(/\W+/g, '-')}-${p.id}`,
+    baris: [['Nama', siswaProfil.name], ['NISN', siswaProfil.nisn], ['Sekolah', siswaProfil.org], ['Capaian', p.badge], ['Nilai', `${p.nilai} / 100`]],
+  });
+const skPemenang = (p) => dokumen(`SK Penetapan Pemenang ${p.judul}`, { jenis: 'sk', nomor: '800/PEMENANG/DIKDA/2024', baris: [['Juara', `${siswaProfil.name} — ${p.badge}`], ['Nilai Akhir', p.nilai]] });
 
 const filters = [
   { id: 'semua', label: 'Semua Lomba' },
@@ -24,6 +34,7 @@ const badgeTone = { gold: 'amber', blue: 'blue', gray: 'gray' };
 // Hasil lomba & prestasi siswa (versi mobile: SiswaHasilLomba.vue)
 export default function HasilPage() {
   const [aktif, setAktif] = useState('semua');
+  const ui = useUi();
   const daftar = prestasi.filter((p) => aktif === 'semua' || p.status === aktif);
   const jumlah = (id) => prestasi.filter((p) => id === 'semua' || p.status === id).length;
 
@@ -73,7 +84,7 @@ export default function HasilPage() {
       {/* ---------- Prestasi ---------- */}
       <section className="grid gap-5 [&>*]:min-w-0 lg:grid-cols-2 xl:grid-cols-3">
         {daftar.map((p) => (
-          <Card key={p.id} as="article" className={cx('flex flex-col gap-4', p.medali === 'gold' && 'border-amber-300 ring-2 ring-amber-100')}>
+          <Card key={p.id} as="article" className={cx('ui-enter flex flex-col gap-4', p.medali === 'gold' && 'border-amber-300 ring-2 ring-amber-100')}>
             <div className="flex flex-wrap items-center justify-between gap-2">
               <Pill tone={badgeTone[p.medali]} icon={p.medali === 'gold' ? IoTrophy : p.status === 'penjurian' ? IoHourglassOutline : undefined}>
                 {p.badge}
@@ -108,8 +119,8 @@ export default function HasilPage() {
 
             {p.aksi && (
               <div className="mt-auto flex flex-wrap gap-2 border-t border-line-soft pt-4">
-                {p.aksi.length > 1 && <Button variant="outline" size="sm" icon={IoDocumentTextOutline}>{p.aksi[0]}</Button>}
-                <Button size="sm" icon={IoDownloadOutline} className="flex-1">{p.aksi[p.aksi.length - 1]}</Button>
+                {p.aksi.length > 1 && <Button variant="outline" size="sm" icon={IoDocumentTextOutline} onClick={() => ui.lihat(skPemenang(p))}>{p.aksi[0]}</Button>}
+                <Button size="sm" icon={IoDownloadOutline} className="flex-1" onClick={() => ui.unduh(sertifikat(p))}>{p.aksi[p.aksi.length - 1]}</Button>
               </div>
             )}
           </Card>
@@ -123,7 +134,7 @@ export default function HasilPage() {
           <b className="block font-bold">Kebutuhan SNBP & Beasiswa</b>
           <small className="text-sm text-muted">Seluruh sertifikat telah dibubuhi QR Code Verifikasi BSrE sah dari Dinas Pendidikan Daerah Provinsi Sulawesi Utara.</small>
         </div>
-        <Button icon={IoPrintOutline}>Cetak Portofolio Prestasi (PDF)</Button>
+        <Button icon={IoPrintOutline} onClick={() => ui.unduh(dokumen(`Portofolio Prestasi ${siswaProfil.name}`, { jenis: 'rekap', label: 'E-Portofolio', baris: [['Nama', siswaProfil.name], ['NISN', siswaProfil.nisn], ['Sekolah', siswaProfil.org], ...prestasi.map((x) => [x.badge, `${x.judul} (${x.meta})`])] }))}>Cetak Portofolio Prestasi (PDF)</Button>
       </Card>
     </div>
   );

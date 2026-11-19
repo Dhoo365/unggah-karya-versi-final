@@ -15,6 +15,9 @@ import {
 import { Button, Card, Pill, SectionHeader } from '../../components/ui/index.js';
 import { Field, TextArea, TextInput } from '../../components/form/index.js';
 import { guruProfil as g } from '../../data/guru.js';
+import { useUi } from '../../components/feedback/index.js';
+import { dokumen } from '../../data/dokumen.js';
+import { KONTAK } from '../../lib/files.js';
 
 const emailOk = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 const teleponOk = (v) => /^(\+62|62|0)8\d{7,11}$/.test(v.replace(/[\s-]/g, ''));
@@ -25,6 +28,16 @@ export default function KontakPage() {
   const [form, setForm] = useState(awal);
   const [sms, setSms] = useState(false);
   const [tersimpan, setTersimpan] = useState(false);
+  const [sinkron, setSinkron] = useState(false);
+  const [waktuSinkron, setWaktuSinkron] = useState('14 Mei 2024, 08:32 WITA oleh Admin Dapodik Sekolah');
+  const ui = useUi();
+  const sinkronisasi = async () => {
+    setSinkron(true);
+    await new Promise((r) => setTimeout(r, 1400)); // TODO: API sinkronisasi Dapodik
+    setSinkron(false);
+    setWaktuSinkron(`${new Date().toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' })} oleh Anda`);
+    ui.toast({ title: 'Sinkronisasi Dapodik selesai', description: 'Data pokok guru sudah yang terbaru.' });
+  };
 
   const errors = {
     email: !form.email ? 'Email wajib diisi.' : emailOk(form.email) ? '' : 'Format email belum benar.',
@@ -44,6 +57,7 @@ export default function KontakPage() {
     // TODO: kirim ke API
     setAwal(form);
     setTersimpan(true);
+    ui.toast({ title: 'Kontak diperbarui', description: 'Perubahan tersimpan di akun Belajar.id Anda.' });
   };
 
   const terkunci = [
@@ -58,7 +72,7 @@ export default function KontakPage() {
         <IoCheckmarkCircle className="mt-0.5 size-6 shrink-0 text-emerald-600" />
         <div className="min-w-0 flex-1">
           <b className="font-bold text-emerald-900">Tersinkronisasi Dapodik Kemendikbudristek</b>
-          <p className="mt-1 text-sm text-emerald-900/80">Pembaruan data sinkronisasi terakhir: 14 Mei 2024, 08:32 WITA oleh Admin Dapodik Sekolah.</p>
+          <p className="mt-1 text-sm text-emerald-900/80">Pembaruan data sinkronisasi terakhir: {waktuSinkron}.</p>
         </div>
         <Pill tone="green">Aktif 2024/2025 Genap</Pill>
       </div>
@@ -93,7 +107,7 @@ export default function KontakPage() {
             <Field label="Nomor WhatsApp / Seluler Aktif" extra={<Pill tone="green">Terverifikasi SMS/WA</Pill>} error={errors.telepon} hint={sms ? 'Permintaan uji SMS dikirim.' : 'Diperlukan untuk koordinasi teknis penganugerahan karya guru.'}>
               <div className="flex gap-2">
                 <TextInput icon={IoCallOutline} type="tel" value={form.telepon} onChange={set('telepon')} error={errors.telepon} className="min-w-0 flex-1" />
-                <Button type="button" variant="outline" disabled={!!errors.telepon} onClick={() => setSms(true)}>Uji SMS</Button>
+                <Button type="button" variant="outline" disabled={!!errors.telepon} onClick={() => { setSms(true); ui.toast({ title: 'SMS uji dikirim', description: form.telepon, tone: 'info' }); }}>Uji SMS</Button>
               </div>
             </Field>
             <Field label="Alamat Domisili Guru" error={errors.alamat} hint="Alamat pengiriman sertifikat cetak & plakat penghargaan lomba.">
@@ -103,7 +117,7 @@ export default function KontakPage() {
               </div>
             </Field>
             <div className="flex flex-col gap-3 border-t border-line-soft pt-5 sm:flex-row sm:justify-end">
-              <Button type="button" variant="ghost" icon={IoSyncOutline}>Sinkronisasi Ulang Dapodik</Button>
+              <Button type="button" variant="ghost" icon={IoSyncOutline} loading={sinkron} onClick={sinkronisasi}>{sinkron ? 'Menyinkronkan...' : 'Sinkronisasi Ulang Dapodik'}</Button>
               <Button type="submit" icon={IoSaveOutline} disabled={!bisaSimpan}>Simpan Perubahan Kontak</Button>
             </div>
           </Card>

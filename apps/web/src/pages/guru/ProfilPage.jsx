@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   IoBookOutline,
   IoCheckmarkCircle,
@@ -19,8 +19,26 @@ import { Button, Card, IconBox, Pill, SectionHeader, StatCard } from '../../comp
 import { InfoList } from '../../components/layout/AccountLayout.jsx';
 import { cx } from '../../lib/cx.js';
 import { guruProfil as g, sertifikatGuru, statistikGuru } from '../../data/guru.js';
+import { Modal, useUi } from '../../components/feedback/index.js';
+import { dokumen } from '../../data/dokumen.js';
+import { KONTAK } from '../../lib/files.js';
+import { IoMedalOutline, IoSchoolOutline } from 'react-icons/io5';
 
-function MenuRow({ to, icon, title, sub, children }) {
+const skDoc = dokumen('SK Kepala Sekolah Penetapan Pembimbing Lomba 2026', {
+  jenis: 'sk',
+  nomor: '421.2/108/SMPN1-MND/I/2026',
+  penerbit: 'Kepala SMP Negeri 1 Manado',
+  ukuran: 'PDF 1.8 MB',
+  baris: [['Nama', g.name], ['NIP', g.nip], ['Tugas', g.peran]],
+});
+const semuaSertifikat = [
+  ...sertifikatGuru,
+  { judul: 'Guru Penggerak Angkatan 9', penerbit: 'Kemendikbudristek', icon: IoSchoolOutline, tone: 'green' },
+  { judul: 'Pembina OSIS Berprestasi Kota Manado 2024', penerbit: 'Disdikbud Kota Manado', icon: IoMedalOutline, tone: 'purple' },
+];
+const sertDoc = (c) => dokumen(c.judul, { jenis: 'sertifikat', penerbit: c.penerbit, baris: [['Diberikan kepada', g.name], ['NIP', g.nip]] });
+
+function MenuRow({ to, onClick, icon, title, sub, children }) {
   const isi = (
     <>
       <IconBox icon={icon} tone="blue" size="sm" />
@@ -31,13 +49,35 @@ function MenuRow({ to, icon, title, sub, children }) {
       {children ?? <IoChevronForward className="size-4 text-subtle" />}
     </>
   );
-  const cls = 'flex items-center gap-3 rounded-xl px-3 py-3 hover:bg-surface';
-  return to ? <Link to={to} className={cls}>{isi}</Link> : <div className={cls}>{isi}</div>;
+  const cls = 'ui-press flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left hover:bg-surface';
+  if (to) return <Link to={to} className={cls}>{isi}</Link>;
+  if (onClick) return <button type="button" onClick={onClick} className={cls}>{isi}</button>;
+  return <div className={cls.replace('ui-press ', '')}>{isi}</div>;
 }
 
 // Profil guru pembimbing (versi mobile: GuruProfil.vue)
 export default function ProfilPage() {
   const [notifikasi, setNotifikasi] = useState(true);
+  const [semua, setSemua] = useState(false);
+  const [skBaru, setSkBaru] = useState(null);
+  const inputSk = useRef(null);
+  const ui = useUi();
+  const navigate = useNavigate();
+  const keluar = async () => {
+    const ok = await ui.confirm({ title: 'Keluar dari Portal Guru?', message: 'Anda perlu masuk kembali untuk mengelola karya siswa.', confirmLabel: 'Ya, Keluar', tone: 'danger', icon: IoLogOutOutline });
+    if (!ok) return;
+    navigate('/onboarding');
+    ui.toast({ title: 'Anda telah keluar', tone: 'info' });
+  };
+  const gantiSk = (e) => {
+    const f = e.target.files?.[0];
+    e.target.value = '';
+    if (!f) return;
+    if (f.type !== 'application/pdf') return ui.toast({ title: 'SK harus berformat PDF', tone: 'error' });
+    if (f.size > 5 * 1024 * 1024) return ui.toast({ title: 'Berkas terlalu besar', description: 'Maksimal 5 MB.', tone: 'error' });
+    setSkBaru(f.name);
+    ui.toast({ title: 'SK baru diunggah', description: `${f.name} • menunggu verifikasi Cabdin.` });
+  };
   return (
     <div className="space-y-8">
       {/* ---------- Identitas ---------- */}
@@ -82,8 +122,8 @@ export default function ProfilPage() {
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button variant="soft" size="sm" icon={IoEyeOutline} className="flex-1">Lihat Dokumen</Button>
-                <Button variant="outline" size="sm" icon={IoDownloadOutline} className="flex-1">Unduh</Button>
+                <Button variant="soft" size="sm" icon={IoEyeOutline} className="flex-1" onClick={() => ui.lihat(skDoc)}>Lihat Dokumen</Button>
+                <Button variant="outline" size="sm" icon={IoDownloadOutline} className="flex-1" onClick={() => ui.unduh(skDoc)}>Unduh</Button>
               </div>
               <div className="flex items-center gap-3 rounded-xl bg-emerald-50 p-3">
                 <IoClipboardOutline className="size-5 text-emerald-700" />
@@ -93,7 +133,9 @@ export default function ProfilPage() {
                 </span>
                 <IoCheckmarkCircle className="size-5 text-emerald-600" />
               </div>
-              <Button variant="ghost" size="sm" icon={IoCloudUploadOutline} className="w-full">Perbarui Berkas SK Penugasan</Button>
+              <input ref={inputSk} type="file" accept="application/pdf" hidden onChange={gantiSk} />
+              {skBaru && <p className="ui-enter rounded-xl bg-amber-50 p-3 text-xs font-medium text-amber-900">SK baru <b>{skBaru}</b> menunggu verifikasi Cabdin.</p>}
+              <Button variant="ghost" size="sm" icon={IoCloudUploadOutline} className="w-full" onClick={() => inputSk.current?.click()}>Perbarui Berkas SK Penugasan</Button>
             </Card>
           </section>
 
@@ -108,10 +150,24 @@ export default function ProfilPage() {
                     <b className="block text-sm font-semibold text-ink">{c.judul}</b>
                     <small className="text-xs text-muted">{c.penerbit}</small>
                   </span>
-                  <Button variant="ghost" size="sm" icon={IoDownloadOutline} aria-label={'Unduh ' + c.judul} />
+                  <Button variant="ghost" size="sm" icon={IoDownloadOutline} aria-label={'Unduh ' + c.judul} onClick={() => ui.unduh(sertDoc(c))} />
                 </div>
               ))}
-              <button type="button" className="w-full pt-1 text-center text-sm font-semibold text-navy hover:underline">Lihat Semua Sertifikat (4)</button>
+              <button type="button" onClick={() => setSemua(true)} className="w-full pt-1 text-center text-sm font-semibold text-navy hover:underline">Lihat Semua Sertifikat ({semuaSertifikat.length})</button>
+              <Modal open={semua} onClose={() => setSemua(false)} icon={IoMedalOutline} title="E-Sertifikat Pembimbing" subtitle={`${semuaSertifikat.length} sertifikat tervalidasi`} footer={<Button variant="ghost" onClick={() => setSemua(false)}>Tutup</Button>}>
+                <div className="space-y-3">
+                  {semuaSertifikat.map((c) => (
+                    <div key={c.judul} className="flex items-center gap-3 rounded-xl border border-line-soft p-3">
+                      <IconBox icon={c.icon} tone={c.tone} />
+                      <span className="min-w-0 flex-1">
+                        <b className="block text-sm font-semibold text-ink">{c.judul}</b>
+                        <small className="text-xs text-muted">{c.penerbit}</small>
+                      </span>
+                      <Button variant="soft" size="sm" icon={IoEyeOutline} onClick={() => { setSemua(false); ui.lihat(sertDoc(c)); }}>Lihat</Button>
+                    </div>
+                  ))}
+                </div>
+              </Modal>
             </Card>
           </section>
         </div>
@@ -127,7 +183,7 @@ export default function ProfilPage() {
                 role="switch"
                 aria-checked={notifikasi}
                 aria-label="Notifikasi WhatsApp & Email"
-                onClick={() => setNotifikasi(!notifikasi)}
+                onClick={() => { setNotifikasi(!notifikasi); ui.toast({ title: notifikasi ? 'Notifikasi dimatikan' : 'Notifikasi diaktifkan', description: notifikasi ? 'Anda tidak akan menerima pesan WhatsApp & email.' : 'Info revisi & penilaian dikirim ke WhatsApp dan email.', tone: 'info', durasi: 3000 }); }}
                 className={cx('relative h-6 w-11 shrink-0 rounded-full transition', notifikasi ? 'bg-navy' : 'bg-slate-300')}
               >
                 <i className={cx('absolute top-0.5 size-5 rounded-full bg-white shadow transition-all', notifikasi ? 'left-[22px]' : 'left-0.5')} />
@@ -135,7 +191,7 @@ export default function ProfilPage() {
             </MenuRow>
             <MenuRow to="/guru/kata-sandi" icon={IoLockClosedOutline} title="Keamanan & Kata Sandi" sub="Ubah password & autentikasi 2 langkah" />
             <MenuRow to="/guru/panduan" icon={IoBookOutline} title="Panduan Guru (Buku Saku PDF)" sub="Standar kurasi & penilaian mandiri" />
-            <MenuRow icon={IoHeadsetOutline} title="Pusat Bantuan & Hotline Cabdin" sub="Helpdesk Teknis Dinas Pendidikan Sulut" />
+            <MenuRow onClick={() => ui.buka(KONTAK.waHelpdesk, 'WhatsApp Helpdesk dibuka')} icon={IoHeadsetOutline} title="Pusat Bantuan & Hotline Cabdin" sub="Helpdesk Teknis Dinas Pendidikan Sulut" />
           </Card>
           <p className="flex gap-2 rounded-2xl bg-soft/40 p-4 text-sm text-muted">
             <IoShieldOutline className="mt-0.5 size-5 shrink-0 text-navy" />
@@ -145,9 +201,7 @@ export default function ProfilPage() {
             <small className="text-xs font-semibold text-subtle">Ringkasan akun</small>
             <InfoList rows={[['Email', g.email], ['WhatsApp', g.telepon], ['Satuan Pendidikan', g.org]]} />
           </Card>
-          <Link to="/onboarding" className="block">
-            <Button variant="danger" icon={IoLogOutOutline} className="w-full">Keluar dari Portal Guru</Button>
-          </Link>
+          <Button variant="danger" icon={IoLogOutOutline} className="w-full" onClick={keluar}>Keluar dari Portal Guru</Button>
         </section>
       </div>
     </div>

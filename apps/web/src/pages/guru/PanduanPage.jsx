@@ -10,10 +10,24 @@ import {
 import { Button, Card, EmptyState, IconBox, Pill, SearchBar, SectionHeader } from '../../components/ui/index.js';
 import { matchQuery } from '../../lib/cx.js';
 import { dokumenPanduan } from '../../data/guru.js';
+import { useUi } from '../../components/feedback/index.js';
+import { dokumen } from '../../data/dokumen.js';
+import { KONTAK } from '../../lib/files.js';
 
 // Panduan guru / buku saku (versi mobile: GuruPanduan.vue)
 export default function PanduanPage() {
   const [cari, setCari] = useState('');
+  const ui = useUi();
+  const bukuSaku = dokumen('Buku Saku Guru Pembimbing Lomba Siswa 2025/2026', {
+    label: 'Buku Saku • Versi 2.1',
+    ukuran: 'PDF 4.2 MB',
+    bagian: [
+      { judul: 'BAB I — Peran Guru Pembimbing', isi: 'Guru pembimbing mendampingi siswa sejak pendaftaran, memastikan orisinalitas karya, dan menjadi penghubung resmi dengan panitia.' },
+      { judul: 'BAB II — Alur Pendaftaran', isi: ['Validasi data siswa di Dapodik.', 'Pilih cabang lomba sesuai jenjang.', 'Unggah karya & dokumen pendukung.', 'Pantau verifikasi Dispen dan penilaian juri.'] },
+      { judul: 'BAB III — Kurasi Mandiri', isi: ['Periksa keaslian karya (cek plagiasi).', 'Pastikan format & ukuran berkas sesuai juknis.', 'Lengkapi surat orisinalitas bermaterai.'] },
+      { judul: 'BAB IV — Etika Pendampingan', isi: 'Guru tidak boleh mengerjakan karya siswa, dan wajib menjaga kerahasiaan data peserta.' },
+    ],
+  });
   const tampil = dokumenPanduan.filter((d) => matchQuery(d, cari, ['judul', 'deskripsi', 'tag']));
 
   return (
@@ -30,8 +44,8 @@ export default function PanduanPage() {
           <p className="mt-2 max-w-2xl text-sm text-ice">Edisi Resmi Dinas Pendidikan Daerah Prov Sulut. Panduan teknis pendampingan kurasi karya siswa jenjang SMA, SMK, dan SLB.</p>
           <p className="mt-3 text-xs text-ice">PDF (4.2 MB) • Terbit Januari 2026 • Dikmen & Diksus</p>
           <div className="mt-5 flex flex-wrap gap-3">
-            <Button variant="gold" icon={IoReaderOutline}>Baca Sekarang</Button>
-            <Button variant="white" icon={IoDownloadOutline}>Unduh PDF</Button>
+            <Button variant="gold" icon={IoReaderOutline} onClick={() => ui.lihat(bukuSaku)}>Baca Sekarang</Button>
+            <Button variant="white" icon={IoDownloadOutline} onClick={() => ui.unduh(bukuSaku)}>Unduh PDF</Button>
           </div>
         </div>
         <div className="hidden h-48 w-36 rotate-3 flex-col justify-between rounded-r-2xl rounded-l-md bg-white p-4 text-navy shadow-2xl ring-4 ring-white/20 lg:flex">
@@ -51,7 +65,7 @@ export default function PanduanPage() {
         {tampil.length ? (
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {tampil.map((d) => (
-              <Card key={d.id} as="article" className="flex flex-col gap-4">
+              <Card key={d.id} as="article" className="ui-enter flex flex-col gap-4">
                 <div className="flex items-start justify-between gap-3">
                   <IconBox icon={d.icon} tone={d.tone} />
                   <Pill tone={d.tone}>{d.tag}</Pill>
@@ -62,7 +76,7 @@ export default function PanduanPage() {
                 </div>
                 <div className="mt-auto flex items-center justify-between border-t border-line-soft pt-4">
                   <small className="inline-flex items-center gap-1 text-xs font-semibold text-subtle"><IoBookmarkOutline className="size-3.5" />{d.format} • {d.ukuran}</small>
-                  <Button size="sm" variant="soft" icon={IoDownloadOutline}>Unduh</Button>
+                  <Button size="sm" variant="soft" icon={IoDownloadOutline} onClick={() => ui.unduh(dokumen(d.judul, { jenis: /Juknis/.test(d.tag) ? 'juknis' : /Juri/.test(d.tag) ? 'nilai' : 'surat', label: d.tag, ukuran: `${d.format} ${d.ukuran}` }))}>Unduh</Button>
                 </div>
               </Card>
             ))}
@@ -78,7 +92,7 @@ export default function PanduanPage() {
           <b className="block font-bold">Perlu panduan video tutorial?</b>
           <small className="text-sm text-muted">Tonton video tata cara verifikasi karya di kanal YouTube Resmi Dikda Sulut untuk penjelasan tahapan kurasi langkah demi langkah.</small>
         </div>
-        <Button variant="outline">Buka YouTube Dikda</Button>
+        <Button variant="outline" onClick={() => ui.buka(KONTAK.youtube, 'YouTube Dikda Sulut dibuka')}>Buka YouTube Dikda</Button>
       </Card>
     </div>
   );

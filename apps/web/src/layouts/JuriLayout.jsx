@@ -1,4 +1,5 @@
 import { IoCheckboxOutline, IoClipboardOutline, IoHammerOutline, IoPersonOutline, IoPlayCircleOutline } from 'react-icons/io5';
+import { notifikasi } from '../data/notifikasi.js';
 import DashboardLayout from '../components/layout/DashboardLayout.jsx';
 import { juriProfile } from '../data/juri.js';
 
@@ -26,7 +27,8 @@ export default function JuriLayout() {
         role: 'Ketua Dewan Juri',
         org: juriProfile.org,
       }}
-      notifications={3}
+      notifications={notifikasi.juri}
+      profilePath="/juri/profil"
     />
   );
 }

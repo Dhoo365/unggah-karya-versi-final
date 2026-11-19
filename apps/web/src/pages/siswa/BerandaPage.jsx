@@ -10,6 +10,8 @@ import {
 } from 'react-icons/io5';
 import { Button, Card, FilterChips, IconBox, Pill, SectionHeader } from '../../components/ui/index.js';
 import { jenjangFilter, lombaAktif, sorotanLomba, statBeranda } from '../../data/siswa.js';
+import { useUi } from '../../components/feedback/index.js';
+import { dokumen } from '../../data/dokumen.js';
 
 // Hitung mundur ke tenggat (hari/jam/menit/detik)
 function useCountdown(target) {
@@ -31,6 +33,7 @@ function useCountdown(target) {
 // Beranda Siswa (versi mobile: SiswaBeranda.vue)
 export default function BerandaPage() {
   const navigate = useNavigate();
+  const ui = useUi();
   const labels = jenjangFilter.map((j) => j.label);
   const [aktif, setAktif] = useState(labels[0]);
   const idAktif = jenjangFilter.find((j) => j.label === aktif)?.id;
@@ -55,7 +58,7 @@ export default function BerandaPage() {
             <p className="mt-2 text-sm text-ice">{sorotanLomba.sub}</p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Button variant="gold" iconRight={IoArrowForwardOutline} onClick={() => navigate('/siswa/unggah')}>Daftar Sekarang</Button>
-              <Button variant="white" icon={IoDownloadOutline}>Unduh Juknis Resmi</Button>
+              <Button variant="white" icon={IoDownloadOutline} onClick={() => ui.unduh(dokumen(`Juknis ${sorotanLomba.judul} 2025`, { jenis: 'juknis', nomor: '421.3/DIKDA-SULUT/2025' }))}>Unduh Juknis Resmi</Button>
             </div>
           </div>
           <div className="grid grid-cols-4 gap-2 sm:gap-3">
@@ -87,7 +90,7 @@ export default function BerandaPage() {
         <FilterChips items={labels} active={aktif} onChange={setAktif} />
         <div className="grid gap-5 md:grid-cols-2">
           {daftar.map((l) => (
-            <Card key={l.id} as="article" className="flex flex-col gap-4">
+            <Card key={l.id} as="article" className="ui-enter flex flex-col gap-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <IconBox icon={l.icon} tone={l.tone} />
@@ -107,7 +110,7 @@ export default function BerandaPage() {
                 <span className="text-subtle">Kuota: <b className="block text-ink">{l.kuota}</b></span>
               </div>
               <div className="mt-auto flex gap-2">
-                <Button variant="outline" size="sm" icon={IoDocumentTextOutline} className="flex-1">Pedoman Juknis</Button>
+                <Button variant="outline" size="sm" icon={IoDocumentTextOutline} className="flex-1" onClick={() => ui.lihat(dokumen(`Pedoman Juknis ${l.judul}`, { jenis: 'juknis', baris: [['Bidang', l.bidang], ['Jenjang', l.jenjangTag], ['Tenggat', l.tenggat], ['Kuota', l.kuota]] }))}>Pedoman Juknis</Button>
                 <Button size="sm" iconRight={IoArrowForwardOutline} className="flex-1" onClick={() => navigate('/siswa/unggah')}>Detail & Kirim</Button>
               </div>
             </Card>

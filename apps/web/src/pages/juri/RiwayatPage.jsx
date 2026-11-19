@@ -10,13 +10,66 @@ import {
 } from 'react-icons/io5';
 import { Button, Card, FilterChips, Pill, SectionHeader } from '../../components/ui/index.js';
 import { riwayat, riwayatFilters } from '../../data/juriPenilaian.js';
+import { Modal, useUi } from '../../components/feedback/index.js';
+import { dokumen } from '../../data/dokumen.js';
+import { IoTimeOutline } from 'react-icons/io5';
+
+const filterRegex = { 1: /tari/i, 2: /kriya|vokasi/i };
+const lembar = (r) =>
+  dokumen(`Lembar Nilai ${r.code} — ${r.title}`, {
+    jenis: 'nilai',
+    nomor: r.code.replace('#', ''),
+    baris: [
+      ['Peserta', r.name],
+      ['Sekolah', r.school],
+      ['Lomba', r.lomba],
+      ...(r.breakdown ?? []).map((b) => [`${b.k} ${b.name} (bobot ${b.weight}%)`, b.value]),
+      ['Skor Akhir', `${r.score} • ${r.grade}`],
+      ...(r.quote ? [['Catatan Juri', r.quote]] : []),
+      ['Status', r.lockLabel],
+    ],
+  });
+const auditLog = [
+  { waktu: '24 Feb 2026 • 21.14', aksi: 'Nilai #TR-FINAL-08 ditandatangani TTE BSrE' },
+  { waktu: '24 Feb 2026 • 20.52', aksi: 'Nilai #KR-FINAL-02 dikunci (final)' },
+  { waktu: '23 Feb 2026 • 16.30', aksi: 'Draf #TR-FINAL-05 diperbarui (Wirasa 80 → 84)' },
+  { waktu: '22 Feb 2026 • 09.05', aksi: 'Login dari Chrome • Manado' },
+];
 
 // Riwayat penilaian juri (versi mobile: JuriRiwayat.vue)
 export default function RiwayatPage() {
   const [filter, setFilter] = useState(riwayatFilters[0]);
+  const ui = useUi();
+  const [audit, setAudit] = useState(false);
+  const [terkirim, setTerkirim] = useState(false);
+  const idx = riwayatFilters.indexOf(filter);
+  const daftar = riwayat.filter((r) => !filterRegex[idx] || filterRegex[idx].test(r.lomba));
+  const kirimPleno = async () => {
+    const ok = await ui.confirm({
+      title: 'Kirim rekap pleno ke sekretariat?',
+      message: `${riwayat.length} lembar nilai terkunci akan dikirim ke Sekretariat Disdikbud Manado.`,
+      confirmLabel: 'Kirim Rekap',
+      icon: IoSendOutline,
+      delay: 800,
+    });
+    if (!ok) return;
+    setTerkirim(true);
+    ui.toast({ title: 'Rekap pleno terkirim', description: 'Sekretariat akan mengonfirmasi penerimaan melalui notifikasi.' });
+  };
 
   return (
     <div className="space-y-8">
+      <Modal open={audit} onClose={() => setAudit(false)} icon={IoFingerPrintOutline} title="Audit Log Penilaian" subtitle="Jejak aktivitas tanda tangan & penguncian nilai" footer={<Button variant="ghost" onClick={() => setAudit(false)}>Tutup</Button>}>
+        <ol className="relative space-y-5 border-l-2 border-line-soft pl-5">
+          {auditLog.map((l, i) => (
+            <li key={l.waktu} className="relative">
+              <i className={'absolute top-1 -left-[27px] size-3.5 rounded-full ring-4 ring-white ' + (i === 0 ? 'bg-navy' : 'bg-slate-300')} />
+              <small className="flex items-center gap-1 text-xs text-subtle"><IoTimeOutline className="size-3.5" />{l.waktu}</small>
+              <p className="text-sm font-medium text-ink">{l.aksi}</p>
+            </li>
+          ))}
+        </ol>
+      </Modal>
       {/* ---------- Rekap ---------- */}
       <section className="grid gap-4 lg:grid-cols-3">
         <Card className="flex flex-col justify-between gap-4 bg-gradient-to-br from-navy-dark to-navy text-white lg:col-span-1">
@@ -25,7 +78,7 @@ export default function RiwayatPage() {
             <h2 className="mt-2 text-2xl font-extrabold">Riwayat Penilaian</h2>
             <p className="text-sm text-ice">Karya telah dikunci & sah</p>
           </div>
-          <Button variant="white" icon={IoDownloadOutline} className="w-fit">Rekap PDF</Button>
+          <Button variant="white" icon={IoDownloadOutline} className="w-fit" onClick={() => ui.unduh(dokumen('Rekap Penilaian Dewan Juri 2026', { jenis: 'rekap', baris: riwayat.map((r) => [`${r.code} ${r.name}`, `${r.title} • ${r.score}`]) }))}>Rekap PDF</Button>
         </Card>
         <Card className="space-y-2">
           <div className="flex items-center justify-between">
@@ -46,15 +99,15 @@ export default function RiwayatPage() {
         <span className="inline-flex items-center gap-2 font-semibold text-emerald-800">
           <IoFingerPrintOutline className="size-5" /> Tanda Tangan Elektronik (TTE BSrE) Sah
         </span>
-        <a href="#" className="font-bold text-navy hover:underline">Audit Log</a>
+        <button type="button" onClick={() => setAudit(true)} className="font-bold text-navy hover:underline">Audit Log</button>
       </div>
 
       <FilterChips items={riwayatFilters} active={filter} onChange={setFilter} />
 
       {/* ---------- Daftar karya ---------- */}
       <section className="grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
-        {riwayat.map((r) => (
-          <Card key={r.code} as="article" className="flex flex-col gap-4">
+        {daftar.map((r) => (
+          <Card key={r.code} as="article" className="ui-enter flex flex-col gap-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="text-xs font-bold text-secondary">{r.code} • {r.lomba}</span>
               <Pill tone={r.lock === 'ttd' ? 'green' : 'gray'} icon={r.lock === 'ttd' ? IoCheckmarkCircleOutline : IoLockClosedOutline}>
@@ -104,11 +157,11 @@ export default function RiwayatPage() {
             <div className="mt-auto flex flex-wrap gap-2 border-t border-line-soft pt-4">
               {r.breakdown ? (
                 <>
-                  <Button variant="outline" size="sm" icon={IoDocumentTextOutline}>Lihat Lembar Nilai</Button>
-                  <Button variant="soft" size="sm" icon={IoDownloadOutline}>Unduh Bukti Nilai PDF</Button>
+                  <Button variant="outline" size="sm" icon={IoDocumentTextOutline} onClick={() => ui.lihat(lembar(r))}>Lihat Lembar Nilai</Button>
+                  <Button variant="soft" size="sm" icon={IoDownloadOutline} onClick={() => ui.unduh(lembar(r))}>Unduh Bukti Nilai PDF</Button>
                 </>
               ) : (
-                <Button variant="soft" size="sm" className="w-full">Lihat Detail Nilai</Button>
+                <Button variant="soft" size="sm" className="w-full" onClick={() => ui.lihat(lembar(r))}>Lihat Detail Nilai</Button>
               )}
             </div>
           </Card>
@@ -122,7 +175,7 @@ export default function RiwayatPage() {
           subtitle="Seluruh nilai juri telah terkunci pada server Dikda Sulut. Kirim berkas salinan fisik pleno ke sekretariat Disdikbud Manado."
           className="max-w-2xl"
         />
-        <Button icon={IoSendOutline}>Kirim Rekap Pleno ke Sekretariat</Button>
+        <Button icon={terkirim ? IoCheckmarkCircleOutline : IoSendOutline} variant={terkirim ? 'soft' : 'primary'} onClick={terkirim ? () => ui.toast({ title: 'Rekap sudah terkirim', description: 'Menunggu konfirmasi sekretariat.', tone: 'info' }) : kirimPleno}>{terkirim ? 'Rekap Terkirim' : 'Kirim Rekap Pleno ke Sekretariat'}</Button>
       </Card>
     </div>
   );

@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IoCheckmarkCircle, IoLockClosedOutline, IoLogoWhatsapp, IoMailOutline, IoTimeOutline } from 'react-icons/io5';
 import AccountLayout, { StepList } from '../../../components/layout/AccountLayout.jsx';
+import { useUi } from '../../../components/feedback/index.js';
+import { KONTAK } from '../../../lib/files.js';
 import { Avatar, Button, Card, Pill } from '../../../components/ui/index.js';
 import { OtpInput } from '../../../components/form/index.js';
 import { cx } from '../../../lib/cx.js';
@@ -13,6 +15,7 @@ const JEDA = 90; // detik sebelum boleh kirim ulang
 // Verifikasi OTP akun siswa (versi mobile: SiswaVerifikasi.vue)
 export default function VerifikasiPage() {
   const navigate = useNavigate();
+  const ui = useUi();
   const [digits, setDigits] = useState(Array(PANJANG).fill(''));
   const [galat, setGalat] = useState('');
   const [sisa, setSisa] = useState(JEDA);
@@ -33,6 +36,21 @@ export default function VerifikasiPage() {
     setDigits(Array(PANJANG).fill(''));
     setGalat('');
     setSisa(JEDA);
+    ui.toast({ title: 'Kode baru dikirim', description: `Cek WhatsApp ${siswaTerdaftar.telepon}.` });
+  };
+  const gantiKontak = async () => {
+    const email = await ui.confirm({
+      title: 'Ganti email penerima kode',
+      message: 'Kode verifikasi akan dikirim ulang ke alamat baru.',
+      confirmLabel: 'Kirim ke Email Baru',
+      icon: IoMailOutline,
+      prompt: { label: 'Email baru', placeholder: 'nama@gmail.com', multiline: false, type: 'email', value: siswaTerdaftar.email, min: 6, error: 'Masukkan alamat email yang valid.' },
+    });
+    if (!email) return;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return ui.toast({ title: 'Email tidak valid', description: email, tone: 'error' });
+    setDigits(Array(PANJANG).fill(''));
+    setSisa(JEDA);
+    ui.toast({ title: 'Kode dikirim ke email baru', description: email });
   };
 
   const verifikasi = async () => {
@@ -102,14 +120,14 @@ export default function VerifikasiPage() {
             Kirim via WhatsApp
           </button>
           <span className="text-line">|</span>
-          <button type="button" className="text-navy hover:underline">Ganti Email / No. HP</button>
+          <button type="button" onClick={gantiKontak} className="text-navy hover:underline">Ganti Email / No. HP</button>
         </div>
         <Button size="lg" className="w-full" disabled={!lengkap || memverifikasi} onClick={verifikasi}>
           {memverifikasi ? 'Memverifikasi...' : 'Verifikasi & Masuk ke Beranda'}
         </Button>
         <div className="flex flex-wrap justify-center gap-3">
           <Button variant="outline" size="sm" onClick={() => window.open('https://mail.google.com', '_blank', 'noopener')}>Buka Gmail Siswa</Button>
-          <Button variant="ghost" size="sm">Bantuan Dapodik</Button>
+          <Button variant="ghost" size="sm" onClick={() => ui.buka(KONTAK.waHelpdesk, 'WhatsApp Helpdesk dibuka')}>Bantuan Dapodik</Button>
         </div>
       </Card>
 

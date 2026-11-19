@@ -5,10 +5,28 @@ import { cx } from '../../lib/cx.js';
 import { toneText } from '../../lib/tones.js';
 import { juriProfile } from '../../data/juri.js';
 import { dokumenJuri, profilStats } from '../../data/juriPenilaian.js';
+import { useUi } from '../../components/feedback/index.js';
+import { dokumen } from '../../data/dokumen.js';
+import { IoEyeOutline } from 'react-icons/io5';
+
+const docJuri = (d) =>
+  dokumen(d.title, {
+    jenis: /SK/.test(d.title) ? 'sk' : /Sertifikat/.test(d.title) ? 'sertifikat' : 'surat',
+    label: /Pakta/.test(d.title) ? 'Pakta Integritas' : undefined,
+    nomor: d.mono ? d.desc.replace('No. ', '') : undefined,
+    baris: [['Nama', juriProfile.name], ['NIP', juriProfile.nip], ['Keterangan', d.desc]],
+  });
 
 // Profil juri (versi mobile: JuriProfil.vue)
 export default function ProfilPage() {
   const navigate = useNavigate();
+  const ui = useUi();
+  const keluar = async () => {
+    const ok = await ui.confirm({ title: 'Keluar dari akun juri?', message: 'Draf penilaian Anda sudah tersimpan otomatis.', confirmLabel: 'Ya, Keluar', tone: 'danger', icon: IoLogOutOutline });
+    if (!ok) return;
+    navigate('/onboarding');
+    ui.toast({ title: 'Anda telah keluar', tone: 'info' });
+  };
 
   return (
     <div className="grid gap-8 xl:grid-cols-[360px_1fr]">
@@ -34,7 +52,7 @@ export default function ProfilPage() {
             </div>
           </div>
         </Card>
-        <Button variant="danger" className="w-full" icon={IoLogOutOutline} onClick={() => navigate('/onboarding')}>
+        <Button variant="danger" className="w-full" icon={IoLogOutOutline} onClick={keluar}>
           Keluar dari Akun
         </Button>
       </aside>
@@ -55,16 +73,19 @@ export default function ProfilPage() {
           <SectionHeader title="Legalitas & Surat Penugasan" action={<Pill tone="gray">T.A. 2026</Pill>} />
           <div className="space-y-3">
             {dokumenJuri.map((d) => (
-              <Card key={d.title} className="flex flex-wrap items-center gap-4">
+              <Card key={d.title} className="ui-enter flex flex-wrap items-center gap-4">
                 <IconBox icon={d.icon} tone={d.tone} />
                 <div className="min-w-0 flex-1">
                   <b className="block text-sm font-bold text-ink">{d.title}</b>
                   <span className={cx('text-xs text-muted', d.mono && 'font-mono')}>{d.desc}</span>
                 </div>
                 {d.action ? (
-                  <Button variant="soft" size="sm">{d.action}</Button>
+                  <Button variant="soft" size="sm" icon={IoEyeOutline} onClick={() => ui.lihat(docJuri(d))}>{d.action}</Button>
                 ) : (
-                  <Pill tone={d.badgeTone} icon={d.badgeIcon}>{d.badge}</Pill>
+                  <span className="flex items-center gap-2">
+                    <Pill tone={d.badgeTone} icon={d.badgeIcon}>{d.badge}</Pill>
+                    <Button variant="ghost" size="sm" icon={IoEyeOutline} onClick={() => ui.lihat(docJuri(d))}>Lihat</Button>
+                  </span>
                 )}
               </Card>
             ))}

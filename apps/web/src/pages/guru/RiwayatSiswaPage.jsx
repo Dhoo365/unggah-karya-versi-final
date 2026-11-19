@@ -14,6 +14,8 @@ import { Avatar, Button, Card, IconBox, Pill, SectionHeader } from '../../compon
 import AuditTimeline from '../../components/guru/AuditTimeline.jsx';
 import { cx } from '../../lib/cx.js';
 import { logAudit, portofolioSiswa, siswaBinaan, statusSiswa } from '../../data/guru.js';
+import { useUi } from '../../components/feedback/index.js';
+import { dokumen } from '../../data/dokumen.js';
 
 // Riwayat portofolio satu siswa (versi mobile: GuruRiwayatSiswa.vue)
 export default function RiwayatSiswaPage() {
@@ -22,6 +24,9 @@ export default function RiwayatSiswaPage() {
   const st = statusSiswa[siswa.status];
   const { lomba, catatanGuru, peminatan } = portofolioSiswa;
   const [tab, setTab] = useState('karya');
+  const ui = useUi();
+  const submisi = (l) => dokumen(`Submisi: ${l.judul}`, { label: 'Detail Submisi', baris: [['Siswa', siswa.name], ['NISN', siswa.nisn], ['Kompetisi', l.kompetisi], ['Tahap', l.label], ['Tanggal Submisi', l.tanggal], ['Skor Sementara', l.skor], ['Catatan', l.catatan ?? '—']] });
+  const sertifikat = (l) => dokumen(`E-Sertifikat ${l.label} — ${l.judul}`, { jenis: 'sertifikat', nomor: l.noReg, baris: [['Nama', siswa.name], ['NISN', siswa.nisn], ['Kompetisi', l.kompetisi], ['Skor Akhir', l.skor]] });
   const statistik = [
     { label: 'Lomba Diikuti', value: lomba.length, cls: 'text-navy' },
     { label: 'Dalam Penjurian', value: lomba.filter((l) => l.tipe === 'proses').length, cls: 'text-secondary' },
@@ -100,8 +105,8 @@ export default function RiwayatSiswaPage() {
                 {l.catatan && <p className="text-sm text-muted">Catatan: {l.catatan}</p>}
                 <div className="flex justify-end">
                   {l.tipe === 'proses'
-                    ? <Button variant="outline" size="sm" icon={IoEyeOutline}>Lihat Detail Submisi</Button>
-                    : <Button size="sm" icon={IoDownloadOutline}>Unduh E-Sertifikat</Button>}
+                    ? <Button variant="outline" size="sm" icon={IoEyeOutline} onClick={() => ui.lihat(submisi(l))}>Lihat Detail Submisi</Button>
+                    : <Button size="sm" icon={IoDownloadOutline} onClick={() => ui.unduh(sertifikat(l))}>Unduh E-Sertifikat</Button>}
                 </div>
               </Card>
             ))}
@@ -112,7 +117,7 @@ export default function RiwayatSiswaPage() {
               <blockquote className="border-l-4 border-gold pl-4 text-sm leading-relaxed text-ink italic">“{catatanGuru.isi}”</blockquote>
               <small className="block text-xs text-muted">{catatanGuru.nama} • Diperbarui {catatanGuru.tanggal}</small>
             </Card>
-            <Button variant="outline" icon={IoPrintOutline} className="w-full">Cetak Rekap Portofolio (PDF)</Button>
+            <Button variant="outline" icon={IoPrintOutline} className="w-full" onClick={() => ui.unduh(dokumen(`Rekap Portofolio ${siswa.name}`, { jenis: 'rekap', label: 'Rekap Portofolio', baris: [['Nama', siswa.name], ['NISN', siswa.nisn], ['Kelas', siswa.kelas], ['Peminatan', peminatan], ...lomba.map((l) => [l.kompetisi, `${l.judul} • ${l.label} • Skor ${l.skor}`]), ['Catatan Guru', catatanGuru.isi]] }))}>Cetak Rekap Portofolio (PDF)</Button>
           </aside>
         </div>
       ) : (

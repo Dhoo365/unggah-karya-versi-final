@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IoChatbubbleEllipsesOutline, IoHourglassOutline, IoLockClosedOutline, IoLogOutOutline, IoSyncOutline } from 'react-icons/io5';
 import AccountLayout, { InfoList } from '../../../components/layout/AccountLayout.jsx';
+import { useUi } from '../../../components/feedback/index.js';
+import { KONTAK } from '../../../lib/files.js';
 import { Button, Card, Pill } from '../../../components/ui/index.js';
 import { cx } from '../../../lib/cx.js';
 import { pengajuanSiswa as p } from '../../../data/siswaAkun.js';
@@ -11,11 +13,21 @@ export default function StatusPage() {
   const navigate = useNavigate();
   const [memuat, setMemuat] = useState(false);
 
+  const ui = useUi();
   const cekStatus = async () => {
     if (memuat) return;
     setMemuat(true);
     // TODO: cek status ke API. Jika disetujui → navigate('/siswa')
-    setTimeout(() => setMemuat(false), 1200);
+    await new Promise((r) => setTimeout(r, 1200));
+    setMemuat(false);
+    ui.toast({
+      title: 'Status belum berubah',
+      description: 'Berkas Anda masih dalam antrean peninjauan.',
+      tone: 'info',
+      durasi: 7000,
+      // tombol demo untuk melihat alur setelah akun disetujui
+      action: { label: 'Simulasikan disetujui →', onClick: () => { navigate('/siswa'); ui.toast({ title: 'Akun disetujui!', description: 'Selamat datang di portal SIKARYA.' }); } },
+    });
   };
 
   return (
@@ -58,7 +70,7 @@ export default function StatusPage() {
         <Button className="sm:col-span-3" size="lg" onClick={cekStatus} disabled={memuat} icon={() => <IoSyncOutline className={cx('size-5', memuat && 'animate-spin')} />}>
           {memuat ? 'Memeriksa Status...' : 'Perbarui Status'}
         </Button>
-        <Button variant="outline" icon={IoChatbubbleEllipsesOutline} className="sm:col-span-2">Hubungi Guru</Button>
+        <Button variant="outline" icon={IoChatbubbleEllipsesOutline} className="sm:col-span-2" onClick={() => ui.buka(KONTAK.waHelpdesk, 'WhatsApp dibuka')}>Hubungi Guru</Button>
         <Button variant="danger" icon={IoLogOutOutline} onClick={() => navigate('/')}>Keluar Akun</Button>
       </div>
     </AccountLayout>

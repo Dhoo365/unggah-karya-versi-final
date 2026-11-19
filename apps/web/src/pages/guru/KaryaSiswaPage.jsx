@@ -18,6 +18,9 @@ import {
 import { Button, Card, EmptyState, Pill, ProgressBar } from '../../components/ui/index.js';
 import { cx } from '../../lib/cx.js';
 import { karyaSiswa } from '../../data/guru.js';
+import { useUi } from '../../components/feedback/index.js';
+import { dokumen } from '../../data/dokumen.js';
+import { KONTAK } from '../../lib/files.js';
 
 const statusInfo = {
   menunggu: { label: 'Diajukan → Menunggu Verifikasi Dispen', tone: 'amber', icon: IoPaperPlane },
@@ -38,7 +41,27 @@ export default function KaryaSiswaPage() {
   const [filter, setFilter] = useState('semua');
   const f = filters.find((x) => x.key === filter);
   const tampil = karya.filter(f.cocok);
-  const tarik = (id) => setKarya((d) => d.filter((k) => k.id !== id)); // TODO: konfirmasi + API
+  const ui = useUi();
+  const tarik = async (k) => {
+    const ok = await ui.confirm({
+      title: 'Tarik pengajuan karya?',
+      message: `${k.judul} • ${k.siswa}`,
+      detail: 'Karya dikembalikan ke draf sekolah dan keluar dari antrean verifikasi Dispen.',
+      confirmLabel: 'Tarik Karya',
+      tone: 'danger',
+      icon: IoCloseCircleOutline,
+    });
+    if (!ok) return;
+    const lama = karya;
+    setKarya((d) => d.filter((x) => x.id !== k.id)); // TODO: API
+    ui.toast({ title: 'Pengajuan ditarik', description: k.judul, tone: 'info', durasi: 6000, action: { label: 'Urungkan', onClick: () => setKarya(lama) } });
+  };
+  const lihatBerkas = (k) =>
+    ui.lihat(dokumen(k.judul, { label: 'Berkas Karya', ukuran: k.ukuran, namaFile: (k.file ?? k.judul).replace(/\.\w+$/, '') + '.pdf', baris: [['Siswa', `${k.siswa} • Kelas ${k.kelas}`], ['Kategori', k.kategori], ['Berkas', k.file ?? '—'], ['Diajukan', k.tanggal ?? '—']] }));
+  const catatanJuri = (k) =>
+    ui.lihat(dokumen(`Catatan Evaluasi — ${k.judul}`, { label: 'Catatan Juri', baris: [['Siswa', k.siswa], ['Kategori', k.kategori], ['Batas Perbaikan', k.batas]], bagian: [{ judul: 'Alasan Penolakan Dispen', isi: k.alasan }, { judul: 'Langkah Perbaikan', isi: ['Bubuhkan meterai Rp10.000 pada surat orisinalitas.', 'Minta tanda tangan & stempel Kepala Sekolah.', 'Unggah ulang melalui menu Unggah Karya sebelum batas waktu.'] }] }));
+  const rubrikNilai = (k) =>
+    ui.lihat(dokumen(`Rubrik Penilaian — ${k.judul}`, { jenis: 'nilai', baris: [['Siswa', k.siswa], ['Skor Sementara', `${k.skor} / 100`], ['Juri Selesai', `${k.juriSelesai} dari ${k.juriTotal}`]] }));
 
   return (
     <div className="space-y-6">
@@ -75,7 +98,7 @@ export default function KaryaSiswaPage() {
             const st = statusInfo[k.status];
             const Kat = k.kategoriIcon;
             return (
-              <Card key={k.id} as="article" className={cx('flex flex-col gap-4', k.status === 'revisi' && 'border-red-200')}>
+              <Card key={k.id} as="article" className={cx('ui-enter flex flex-col gap-4', k.status === 'revisi' && 'border-red-200')}>
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <Pill tone={st.tone} icon={st.icon}>{st.label}</Pill>
                   {k.tanggal && <small className="text-xs text-subtle">{k.tanggal}</small>}
@@ -105,8 +128,8 @@ export default function KaryaSiswaPage() {
                       <small className="text-xs text-subtle">{k.ukuran}</small>
                     </div>
                     <div className="mt-auto flex gap-2">
-                      <Button variant="soft" size="sm" icon={IoEyeOutline} className="flex-1">Lihat Berkas</Button>
-                      <Button variant="outline" size="sm" icon={IoCloseCircleOutline} className="flex-1" onClick={() => tarik(k.id)}>Tarik / Batalkan</Button>
+                      <Button variant="soft" size="sm" icon={IoEyeOutline} className="flex-1" onClick={() => lihatBerkas(k)}>Lihat Berkas</Button>
+                      <Button variant="outline" size="sm" icon={IoCloseCircleOutline} className="flex-1" onClick={() => tarik(k)}>Tarik / Batalkan</Button>
                     </div>
                   </>
                 )}
@@ -118,7 +141,7 @@ export default function KaryaSiswaPage() {
                     </p>
                     <div className="mt-auto space-y-2">
                       <Button variant="danger" size="sm" icon={IoCloudUploadOutline} className="w-full" onClick={() => navigate('/guru/unggah')}>Perbaiki & Upload Ulang Berkas</Button>
-                      <button type="button" className="w-full text-center text-xs font-semibold text-navy hover:underline">Detail Catatan Juri & Evaluasi</button>
+                      <button type="button" onClick={() => catatanJuri(k)} className="w-full text-center text-xs font-semibold text-navy hover:underline">Detail Catatan Juri & Evaluasi</button>
                     </div>
                   </>
                 )}
@@ -132,8 +155,8 @@ export default function KaryaSiswaPage() {
                       <ProgressBar value={(k.juriSelesai / k.juriTotal) * 100} tone="green" />
                     </div>
                     <div className="mt-auto flex gap-2">
-                      <Button variant="gray" size="sm" icon={IoStatsChartOutline} className="flex-1">Rubrik Penilaian</Button>
-                      <Button variant="outline" size="sm" icon={IoShareSocialOutline} aria-label="Bagikan" />
+                      <Button variant="gray" size="sm" icon={IoStatsChartOutline} className="flex-1" onClick={() => rubrikNilai(k)}>Rubrik Penilaian</Button>
+                      <Button variant="outline" size="sm" icon={IoShareSocialOutline} aria-label="Bagikan" onClick={() => ui.bagikan({ title: k.judul, text: `${k.judul} oleh ${k.siswa} sedang dinilai juri SIKARYA.` })} />
                     </div>
                   </>
                 )}

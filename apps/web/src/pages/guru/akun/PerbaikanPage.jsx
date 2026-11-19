@@ -10,6 +10,8 @@ import {
   IoTimeOutline,
 } from 'react-icons/io5';
 import AccountLayout from '../../../components/layout/AccountLayout.jsx';
+import { useUi } from '../../../components/feedback/index.js';
+import { KONTAK } from '../../../lib/files.js';
 import { Button, Card, Pill } from '../../../components/ui/index.js';
 import { Field, FilePicker, TextArea, TextInput, scrollToFirstError } from '../../../components/form/index.js';
 import { pengajuanGuru as guru, tiketPerbaikanGuru as tiket } from '../../../data/guruAkun.js';
@@ -19,6 +21,7 @@ const MAKS = 200;
 // Perbaikan berkas akun guru (versi mobile: GuruStatusPerbaikan.vue)
 export default function PerbaikanPage() {
   const navigate = useNavigate();
+  const ui = useUi();
   const [nomorSk, setNomorSk] = useState(tiket.nomorSk);
   const [catatan, setCatatan] = useState('');
   const [berkas, setBerkas] = useState(null);
@@ -114,7 +117,7 @@ export default function PerbaikanPage() {
               <TextArea maxLength={MAKS} placeholder="Tulis klarifikasi singkat..." value={catatan} onChange={(e) => setCatatan(e.target.value)} />
             </Field>
             <Button type="submit" size="lg" className="w-full" icon={IoSendOutline} disabled={mengirim}>{mengirim ? 'Mengirim...' : 'Kirim Ulang Berkas Guru'}</Button>
-            <Button type="button" variant="ghost" className="w-full" icon={IoHeadsetOutline}>Hubungi Helpdesk Cabdin</Button>
+            <Button type="button" variant="ghost" className="w-full" onClick={() => ui.buka(KONTAK.waHelpdesk, 'WhatsApp dibuka')} icon={IoHeadsetOutline}>Hubungi Helpdesk Cabdin</Button>
           </Card>
         </form>
       </div>

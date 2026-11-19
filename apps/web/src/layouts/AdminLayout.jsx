@@ -9,6 +9,7 @@ import {
   IoStatsChartOutline,
   IoTrophyOutline,
 } from 'react-icons/io5';
+import { notifikasi } from '../data/notifikasi.js';
 import DashboardLayout from '../components/layout/DashboardLayout.jsx';
 import { adminProfile } from '../data/admin.js';
 
@@ -42,7 +43,7 @@ export default function AdminLayout() {
       sections={sections}
       profile={adminProfile}
       footnote={{ left: 'Wilayah: Rayon Kota Manado', right: 'Ver. 3.4.1' }}
-      notifications={24}
+      notifications={notifikasi.admin}
     />
   );
 }

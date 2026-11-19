@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { IoArrowBackOutline, IoCloseCircle, IoLogoWhatsapp, IoRefreshOutline } from 'react-icons/io5';
 import AccountLayout, { InfoList, StepList } from '../../components/layout/AccountLayout.jsx';
+import { useUi } from '../feedback/index.js';
+import { KONTAK } from '../../lib/files.js';
 import { Avatar, Button, Card, Pill } from '../../components/ui/index.js';
 
 /*
@@ -15,6 +17,7 @@ import { Avatar, Button, Card, Pill } from '../../components/ui/index.js';
 */
 export default function PengajuanDitolak({ peran, keputusan, rincian, daftarUlang, verifikatorLabel = 'Guru Verifikator Sekolah' }) {
   const navigate = useNavigate();
+  const ui = useUi();
   const nama = keputusan.verifikator ?? keputusan.guru;
 
   return (
@@ -60,7 +63,7 @@ export default function PengajuanDitolak({ peran, keputusan, rincian, daftarUlan
 
       <div className="grid gap-3 sm:grid-cols-3">
         <Button size="lg" icon={IoRefreshOutline} onClick={() => navigate(daftarUlang)}>Daftar Ulang Akun</Button>
-        <Button size="lg" variant="outline" icon={IoLogoWhatsapp}>Hubungi via WhatsApp</Button>
+        <Button size="lg" variant="outline" icon={IoLogoWhatsapp} onClick={() => ui.buka(KONTAK.waHelpdesk, 'WhatsApp dibuka')}>Hubungi via WhatsApp</Button>
         <Button size="lg" variant="ghost" icon={IoArrowBackOutline} onClick={() => navigate('/onboarding')}>Kembali ke Halaman Masuk</Button>
       </div>
     </AccountLayout>

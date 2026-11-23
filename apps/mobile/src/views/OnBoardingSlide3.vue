@@ -1,7 +1,7 @@
 <template>
   <ion-page>
     <ion-content :fullscreen="true" class="onb-content">
-      <div class="onb">
+      <div class="onb" @touchstart.passive="onTouchStart" @touchend.passive="onTouchEnd">
         <header class="onb__header">
           <div class="brand">
             <svg class="brand__logo" viewBox="0 0 40 40" aria-hidden="true">
@@ -70,7 +70,17 @@
     <ion-footer class="ion-no-border">
       <div class="dock">
         <div class="dots" role="tablist" aria-label="Halaman pengenalan">
-          <span v-for="n in total" :key="n" class="dots__item" :class="{ 'dots__item--active': n === current }" />
+          <button
+            v-for="n in total"
+            :key="n"
+            type="button"
+            role="tab"
+            class="dots__item"
+            :class="{ 'dots__item--active': n === current }"
+            :aria-selected="n === current"
+            :aria-label="`Ke slide ${n}`"
+            @click="goTo(n)"
+          />
         </div>
 
         <button class="cta cta--primary" type="button" @click="register">
@@ -90,8 +100,8 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
 import { IonPage, IonContent, IonFooter, IonIcon } from '@ionic/vue';
+import { useOnboarding, ROUTES } from '../composables/useOnboarding';
 import {
   shieldCheckmark,
   ribbonOutline,
@@ -102,25 +112,18 @@ import {
   qrCodeOutline,
 } from 'ionicons/icons';
 
-const router = useRouter();
-
-const total = 3;
-const current = 3;
+const { total, current, goTo, finish, onTouchStart, onTouchEnd } = useOnboarding(3);
 
 const features = [
   { title: 'Rubrik Skor Terbuka', desc: 'Ulasan poin juri obyektif & dapat diaudit.', icon: listOutline, tone: 'blue' },
   { title: 'Sah TTE Kedinasan', desc: 'Barcode QR resmi pengakuan Dikda Sulut.', icon: qrCodeOutline, tone: 'amber' },
 ];
 
-function register() {
-  router.replace('/register');
-}
-function login() {
-  router.replace('/login');
-}
-function guest() {
-  router.replace('/juknis');
-}
+// Daftar & Tamu tetap menyimpan riwayat, jadi tombol kembali bisa balik ke slide ini.
+// Masuk Portal membersihkan riwayat (login jadi halaman root).
+const register = () => finish(ROUTES.register, true);
+const login = () => finish(ROUTES.login);
+const guest = () => finish(ROUTES.guest, true);
 </script>
 
 <style scoped>
@@ -465,8 +468,11 @@ function guest() {
 .dots__item {
   width: 10px;
   height: 10px;
+  padding: 0;
+  border: 0;
   border-radius: 999px;
   background: #cbd5e1;
+  cursor: pointer;
   transition: width 0.25s ease, background 0.25s ease;
 }
 
@@ -521,8 +527,13 @@ function guest() {
   color: #1e293b;
 }
 
+.cta,
+.guest {
+  cursor: pointer;
+}
 .cta:focus-visible,
-.guest:focus-visible {
+.guest:focus-visible,
+.dots__item:focus-visible {
   outline: 2px solid #2f7be0;
   outline-offset: 2px;
 }

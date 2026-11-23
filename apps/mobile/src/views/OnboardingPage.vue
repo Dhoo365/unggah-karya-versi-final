@@ -1,7 +1,7 @@
 <template>
   <ion-page>
     <ion-content :fullscreen="true" class="onb-content">
-      <div class="onb">
+      <div class="onb" @touchstart.passive="onTouchStart" @touchend.passive="onTouchEnd">
         <header class="onb__header">
           <div class="brand">
             <svg class="brand__logo" viewBox="0 0 40 40" aria-hidden="true">
@@ -64,11 +64,16 @@
         </div>
 
         <div class="dots" role="tablist" aria-label="Halaman pengenalan">
-          <span
+          <button
             v-for="n in total"
             :key="n"
+            type="button"
+            role="tab"
             class="dots__item"
             :class="{ 'dots__item--active': n === current }"
+            :aria-selected="n === current"
+            :aria-label="`Ke slide ${n}`"
+            @click="goTo(n)"
           />
         </div>
 
@@ -87,9 +92,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import { useRouter } from 'vue-router';
 import { IonPage, IonContent, IonIcon } from '@ionic/vue';
+import { useOnboarding } from '../composables/useOnboarding';
 import {
   schoolOutline,
   locationOutline,
@@ -104,7 +108,7 @@ import {
   carSportOutline,
 } from 'ionicons/icons';
 
-const router = useRouter();
+const { total, current, next, skip, goTo, onTouchStart, onTouchEnd } = useOnboarding(1);
 
 const slides = [
   {
@@ -131,18 +135,7 @@ const slides = [
   },
 ];
 
-const total = 3;
-const index = ref(0);
-const current = computed(() => index.value + 1);
-const slide = computed(() => slides[Math.min(index.value, slides.length - 1)]);
-
-function next() {
-  if (index.value < total - 1) index.value += 1;
-  else router.replace('/login');
-}
-function skip() {
-  router.replace('/onboarding2');
-}
+const slide = slides[0];
 </script>
 
 <style scoped>
@@ -356,8 +349,11 @@ function skip() {
 .dots__item {
   width: 6px;
   height: 6px;
+  padding: 0;
+  border: 0;
   border-radius: 999px;
   background: #aab6c4;
+  cursor: pointer;
   transition: width 0.25s ease, background 0.25s ease;
 }
 .dots__item--active {
@@ -383,8 +379,13 @@ function skip() {
 .cta:active {
   transform: scale(0.98);
 }
+.cta,
+.skip {
+  cursor: pointer;
+}
 .cta:focus-visible,
-.skip:focus-visible {
+.skip:focus-visible,
+.dots__item:focus-visible {
   outline: 2px solid #2f7be0;
   outline-offset: 2px;
 }

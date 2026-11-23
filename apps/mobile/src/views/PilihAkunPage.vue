@@ -5,7 +5,7 @@
         <i class="akun__handle"></i>
 
         <div class="nav">
-          <button class="nav__btn" type="button" aria-label="Kembali" @click="router.back()">
+          <button class="nav__btn" type="button" aria-label="Kembali" @click="goBack">
             <ion-icon :icon="arrowBackOutline" />
           </button>
           <span class="nav__step">Tahap 1 dari 2</span>
@@ -35,8 +35,13 @@
           v-for="r in roles"
           :key="r.key"
           class="role"
-          :class="{ 'role--muted': r.muted }"
-          @click="choose(r.key)"
+          :class="{ 'role--muted': r.muted, 'role--selected': selected === r.key }"
+          role="button"
+          tabindex="0"
+          :aria-label="`Daftar sebagai ${r.short}`"
+          @click="choose(r)"
+          @keydown.enter.prevent="choose(r)"
+          @keydown.space.prevent="choose(r)"
         >
           <div class="role__head">
             <div class="role__icon" :class="'role__icon--' + r.tone"><ion-icon :icon="r.icon" /></div>
@@ -67,9 +72,12 @@
           <ion-icon :icon="informationCircleOutline" />
           <p>Pastikan data Anda sesuai dengan pangkalan data Dapodik Dikda Sulut.</p>
         </div>
-        <p class="dock__login">Sudah punya akun? <a @click="router.replace('/login')">Masuk Portal</a></p>
+        <p class="dock__login">
+          Sudah punya akun? <a :href="ROUTES.login" @click.prevent="toLogin">Masuk Portal</a>
+        </p>
         <p class="dock__help">
-          <ion-icon :icon="helpCircleOutline" /> Butuh bantuan pendaftaran? <a href="#">Helpdesk Dikda Sulut</a>
+          <ion-icon :icon="helpCircleOutline" /> Butuh bantuan pendaftaran?
+          <a :href="HELPDESK_URL" @click.prevent="openHelpdesk">Helpdesk Dikda Sulut</a>
         </p>
       </div>
     </ion-footer>
@@ -77,8 +85,9 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
-import { IonPage, IonContent, IonFooter, IonIcon } from '@ionic/vue';
+import { ref } from 'vue';
+import { IonPage, IonContent, IonFooter, IonIcon, alertController } from '@ionic/vue';
+import { useNav, ROUTES, ROLE_ROUTES } from '../composables/useOnboarding';
 import {
   arrowBackOutline,
   closeOutline,
@@ -92,9 +101,20 @@ import {
   helpCircleOutline,
 } from 'ionicons/icons';
 
-const router = useRouter();
+const { go, back, ionRouter } = useNav();
 
-const roles = [
+// GANTI dengan kontak helpdesk yang asli (WhatsApp, email, atau halaman bantuan).
+const HELPDESK_URL = 'https://wa.me/62XXXXXXXXXX?text=Halo%20Helpdesk%20SIKARYA%2C%20saya%20butuh%20bantuan%20pendaftaran';
+
+type Role = {
+  key: string; name: string; short: string; tone: string; icon: string;
+  tag: string; desc: string; reqIcon: string; req: string; muted?: boolean;
+};
+
+const selected = ref<string | null>(null);
+let busy = false;
+
+const roles: Role[] = [
   {
     key: 'siswa', name: 'Siswa / Peserta Lomba', short: 'Siswa', tone: 'blue', icon: schoolOutline,
     tag: 'Peserta Mandiri / Tim',
@@ -113,14 +133,41 @@ const roles = [
     desc: 'Aktivasi akun panelis juri independen atau akademisi untuk penilaian karya, rubrik skor, dan kurasi talenta FLS2N/O2SN Kota Manado.',
     reqIcon: shieldCheckmarkOutline, req: 'Memerlukan NIP/NIDN, Pakta Integritas, dan SK Penetapan Kadis',
   },
-] as any[];
+];
 
-function choose(key: string) {
-  router.push(`/register/${key}`);
+/** Dewan Juri (kartu redup) perlu konfirmasi dulu karena aktivasinya lewat SK. */
+async function confirmMuted(r: Role): Promise<boolean> {
+  const alert = await alertController.create({
+    header: `Daftar sebagai ${r.short}?`,
+    message: `Akun ${r.name} hanya untuk panelis yang sudah ditetapkan. ${r.req}.`,
+    buttons: [
+      { text: 'Batal', role: 'cancel' },
+      { text: 'Lanjutkan', role: 'confirm' },
+    ],
+  });
+  await alert.present();
+  const { role } = await alert.onDidDismiss();
+  return role === 'confirm';
 }
-function close() {
-  router.replace('/onboarding');
+
+async function choose(r: Role) {
+  if (busy) return;
+  busy = true;
+  selected.value = r.key; // sorot kartu sebagai umpan balik
+  try {
+    if (r.muted && !(await confirmMuted(r))) return;
+    await new Promise((res) => setTimeout(res, 120));
+    ionRouter.navigate(ROLE_ROUTES[r.key] ?? ROUTES.login, 'forward', 'push');
+  } finally {
+    selected.value = null;
+    busy = false;
+  }
 }
+
+const goBack = () => back(ROUTES.slides[2]);
+const close = () => go(ROUTES.login, 'root', 'replace');
+const toLogin = () => go(ROUTES.login, 'root', 'replace');
+const openHelpdesk = () => window.open(HELPDESK_URL, '_blank', 'noopener');
 </script>
 
 <style scoped>
@@ -232,11 +279,25 @@ function close() {
   background: #fff;
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
   cursor: pointer;
-  transition: transform 0.15s ease;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .role:active {
   transform: scale(0.99);
+}
+
+.role--selected,
+.role:focus-visible {
+  border-color: #0b4a8f;
+  box-shadow: 0 0 0 3px rgba(11, 74, 143, 0.18);
+  outline: none;
+}
+
+.nav__btn:focus-visible,
+.dock a:focus-visible {
+  outline: 2px solid #2f7be0;
+  outline-offset: 2px;
 }
 
 .role--muted {

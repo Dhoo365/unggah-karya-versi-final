@@ -1,7 +1,7 @@
 <template>
   <ion-page>
     <ion-content :scroll-y="false" class="slide-content">
-      <div class="slide">
+      <div class="slide" @touchstart.passive="onTouchStart" @touchend.passive="onTouchEnd">
         <!-- Header -->
         <header class="header">
           <div class="brand">
@@ -16,7 +16,7 @@
               <span>Dikda Sulut</span>
             </div>
           </div>
-          <button class="skip" type="button" @click="lewati">Lewati</button>
+          <button class="skip" type="button" @click="skip">Lewati</button>
         </header>
 
         <!-- Isi -->
@@ -97,18 +97,25 @@
 
         <!-- Footer -->
         <footer class="footer">
-          <div class="dots">
-            <span></span>
-            <span class="active"></span>
-            <span></span>
+          <div class="dots" role="tablist" aria-label="Halaman pengenalan">
+            <button
+              v-for="n in total"
+              :key="n"
+              type="button"
+              role="tab"
+              :class="{ active: n === current }"
+              :aria-selected="n === current"
+              :aria-label="`Ke slide ${n}`"
+              @click="goTo(n)"
+            ></button>
           </div>
 
-          <button class="btn-next" type="button" @click="lanjut">
-            <span>Lanjut (2/3)</span>
+          <button class="btn-next" type="button" @click="next">
+            <span>Lanjut ({{ current }}/{{ total }})</span>
             <ion-icon :icon="arrowForwardOutline" />
           </button>
 
-          <button class="btn-back" type="button" @click="kembali">
+          <button class="btn-back" type="button" @click="prev">
             <ion-icon :icon="arrowBackOutline" />
             <span>Kembali ke Slide 1</span>
           </button>
@@ -128,13 +135,9 @@ import {
   arrowForwardOutline,
   arrowBackOutline,
 } from 'ionicons/icons';
-import { useRouter } from 'vue-router';
+import { useOnboarding } from '../composables/useOnboarding';
 
-const router = useRouter();
-
-const lanjut = () => router.push('/onboarding/3');
-const kembali = () => router.push('/onboarding');
-const lewati = () => router.replace('/login');
+const { total, current, next, prev, skip, goTo, onTouchStart, onTouchEnd } = useOnboarding(2);
 </script>
 
 <style scoped>
@@ -419,13 +422,17 @@ const lewati = () => router.replace('/login');
   align-items: center;
   gap: 5px;
 }
-.dots span {
+.dots button {
   width: 8px;
   height: 8px;
+  padding: 0;
+  border: 0;
   border-radius: 999px;
   background: #9ca3af;
+  cursor: pointer;
+  transition: width 0.25s ease, background 0.25s ease;
 }
-.dots span.active {
+.dots button.active {
   width: 42px;
   background: #0a4f8f;
 }
@@ -468,9 +475,15 @@ const lewati = () => router.replace('/login');
   font-size: 14px;
 }
 
+.skip,
+.btn-next,
+.btn-back {
+  cursor: pointer;
+}
 .skip:focus-visible,
 .btn-next:focus-visible,
-.btn-back:focus-visible {
+.btn-back:focus-visible,
+.dots button:focus-visible {
   outline: 2px solid #0a4f8f;
   outline-offset: 2px;
 }

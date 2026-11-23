@@ -100,7 +100,8 @@ export function useOnboarding(step: number) {
 
   const next = () => (step < total ? goTo(step + 1) : finish(ROUTES.login));
   const prev = () => goTo(step - 1);
-  const skip = () => finish(ROUTES.login);
+  // Lewati: langsung ke halaman Pilih Akun (riwayat disimpan, jadi tombol kembali bisa balik ke onboarding).
+  const skip = () => finish(ROUTES.register, true);
 
   // Tombol back fisik Android: mundur satu slide, di slide 1 pakai perilaku bawaan.
   useBackButton(10, (processNextHandler) => {

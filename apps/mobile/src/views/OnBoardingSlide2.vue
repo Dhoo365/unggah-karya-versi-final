@@ -1,433 +1,556 @@
 <template>
   <ion-page>
-    <ion-content :scroll-y="false" class="slide-content">
-      <div class="slide">
-        <!-- Header -->
-        <header class="header">
+    <ion-content :fullscreen="true" class="peserta-content">
+      <div class="page">
+
+        <!-- Header Top Bar -->
+        <header class="bar">
           <div class="brand">
-            <!-- PENTING: pakai path logo yang sama dengan slide 1 -->
-            <img
-              class="brand__logo"
-              src="/assets/Logo.png"
-              alt="Logo SIKARYA"
-            />
+            <span class="brand__logo">
+              <ion-icon :icon="ribbon" />
+            </span>
             <div class="brand__text">
               <strong>SIKARYA</strong>
-              <span>Dikda Sulut</span>
+              <span>DIKDA SULUT</span>
             </div>
           </div>
-          <button class="skip" type="button" @click="lewati">Lewati</button>
+
+          <button type="button" class="btn-skip" @click="lewatiOnboarding">
+            Lewati
+          </button>
         </header>
 
-        <!-- Isi -->
-        <main class="body">
+        <main class="main">
+
+          <!-- Step Pill Badge -->
           <div class="step-pill">
             <ion-icon :icon="checkmarkCircle" />
-            <span>Langkah 2 dari 3 &bull; Kurasi &amp; Validasi</span>
+            <span>Langkah 2 dari 3 • Kurasi &amp; Validasi</span>
           </div>
 
-          <!-- Kartu pratinjau -->
-          <section class="preview">
-            <div class="chips">
-              <span class="chip chip--blue">MP4<br />VIDEO</span>
-              <span class="chip chip--blue">PDF<br />NASKAH</span>
-              <span class="chip chip--grey">ZIP<br />DATA</span>
-              <span class="chip chip--ssl">
-                <ion-icon :icon="cloudUploadOutline" />
+          <!-- Kartu Ilustrasi Mockup Unggah & Pembimbing -->
+          <section class="illustration-card" aria-hidden="true">
+            <!-- Baris Format Berkas & Enkripsi -->
+            <div class="format-row">
+              <div class="format-badge format-badge--blue">
+                <strong>MP4</strong>
+                <span>VIDEO</span>
+              </div>
+
+              <div class="format-badge format-badge--teal">
+                <strong>PDF</strong>
+                <span>NASKAH</span>
+              </div>
+
+              <div class="format-badge format-badge--gray">
+                <strong>ZIP</strong>
+                <span>DATA</span>
+              </div>
+
+              <div class="ssl-pill">
+                <ion-icon :icon="cloudDone" />
                 <span>Enkripsi<br />SSL</span>
-              </span>
+              </div>
             </div>
 
-            <div class="teacher">
-              <div class="teacher__avatar">
-                <ion-icon :icon="bookOutline" />
+            <!-- Kartu Profil Pembimbing di dalam Mockup -->
+            <div class="mentor-preview">
+              <span class="mentor-preview__avatar">
+                <ion-icon :icon="personCircleOutline" />
+              </span>
+
+              <div class="mentor-preview__info">
+                <strong>Drs. Jan Warouw, M.Pd</strong>
+                <small>Guru Pembimbing • SMAN 1</small>
               </div>
-              <div class="teacher__info">
-                <strong>Drs.Mott Versteppen, S.T</strong>
-                <span>Guru Pembimbing &bull; SMAIN 7</span>
+
+              <div class="mentor-preview__status">
+                <ion-icon :icon="checkmarkCircle" class="verified-icon" />
+                <span class="nuptk-pill">NUPTK Sah</span>
               </div>
-              <span class="teacher__badge"><i></i>NUPTK Sah</span>
             </div>
           </section>
 
-          <h1 class="title">Unggah Karya Praktis<br />Bersama Pembimbing</h1>
-          <p class="desc">
-            Kirim video sinopsis, naskah inovasi, dan portofolio dengan
-            supervisi guru Anda. Berkas otomatis terverifikasi sebelum masuk ke
-            meja dewan juri Dikda Sulut.
-          </p>
+          <!-- Judul & Deskripsi Utama -->
+          <section class="hero-copy">
+            <h1>Unggah Karya Praktis Bersama Pembimbing</h1>
+            <p>
+              Kirim video sinopsis, naskah inovasi, dan portofolio dengan supervisi guru Anda.
+              Berkas otomatis terverifikasi sebelum masuk ke meja dewan juri Dikda Sulut.
+            </p>
+          </section>
 
-          <div class="feature">
-            <div class="feature__icon">
-              <ion-icon :icon="shieldCheckmarkOutline" />
-            </div>
-            <div class="feature__text">
-              <strong>Validasi Otomatis Pra-Submit</strong>
-              <span>
-                Mencegah kesalahan format berkas, Kuota file, atau legalitas
-                yang tidak lengkap.
+          <!-- Daftar Fitur Unggulan -->
+          <section class="feature-list">
+            <div class="feature-item">
+              <span class="feature-item__icon">
+                <ion-icon :icon="shieldCheckmarkOutline" />
               </span>
+              <div class="feature-item__text">
+                <strong>Validasi Otomatis Pra-Submit</strong>
+                <p>
+                  Mencegah kesalahan format berkas, kuota file, atau legalitas yang tidak lengkap.
+                </p>
+              </div>
             </div>
+
+            <div class="feature-item">
+              <span class="feature-item__icon">
+                <ion-icon :icon="laptopOutline" />
+              </span>
+              <div class="feature-item__text">
+                <strong>Status &amp; Catatan Revisi Real-Time</strong>
+                <p>
+                  Dapatkan arahan perbaikan langsung dari pembimbing via notifikasi sistem.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Indikator Slide / Pagination Dots -->
+          <div class="slide-dots" role="tablist" aria-label="Indikator Slide">
+            <span class="dot"></span>
+            <span class="dot dot--active" aria-current="true"></span>
+            <span class="dot"></span>
           </div>
 
-          <div class="feature">
-            <div class="feature__icon">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <rect x="3" y="3" width="18" height="18" rx="3" />
-                <path d="M12 16V8" />
-                <path d="m8.5 11.5 3.5-3.5 3.5 3.5" />
-              </svg>
-            </div>
-            <div class="feature__text">
-              <strong>Status &amp; Catatan Revisi Real-Time</strong>
-              <span>
-                Dapatkan arahan perbaikan langsung dari pembimbing via
-                notifikasi sistem.
-              </span>
-            </div>
+          <!-- Tombol Navigasi Slide -->
+          <div class="nav-actions">
+            <button type="button" class="btn-next" @click="lanjutSlide">
+              <span>Lanjut (2/3)</span>
+              <ion-icon :icon="arrowForward" />
+            </button>
+
+            <button type="button" class="btn-prev" @click="kembaliSlide">
+              <ion-icon :icon="arrowBack" />
+              <span>Kembali ke Slide 1</span>
+            </button>
           </div>
+
+          <!-- Catatan Keamanan Footer -->
+          <footer class="security-footer">
+            <ion-icon :icon="lockClosed" />
+            <span>Data karya terlindungi enkripsi kedinasan Dikda Sulut</span>
+          </footer>
+
         </main>
-
-        <!-- Footer -->
-        <footer class="footer">
-          <div class="dots">
-            <span></span>
-            <span class="active"></span>
-            <span></span>
-          </div>
-
-          <button class="btn-next" type="button" @click="lanjut">
-            <span>Lanjut (2/3)</span>
-            <ion-icon :icon="arrowForwardOutline" />
-          </button>
-
-          <button class="btn-back" type="button" @click="kembali">
-            <ion-icon :icon="arrowBackOutline" />
-            <span>Kembali ke Slide 1</span>
-          </button>
-        </footer>
       </div>
     </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
+import { useRouter } from 'vue-router';
 import { IonPage, IonContent, IonIcon } from '@ionic/vue';
 import {
+  ribbon,
   checkmarkCircle,
-  cloudUploadOutline,
-  bookOutline,
+  cloudDone,
+  personCircleOutline,
   shieldCheckmarkOutline,
-  arrowForwardOutline,
-  arrowBackOutline,
+  laptopOutline,
+  arrowForward,
+  arrowBack,
+  lockClosed
 } from 'ionicons/icons';
-import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
-const lanjut = () => router.push('/onboarding/3');
-const kembali = () => router.push('/onboarding');
-const lewati = () => router.replace('/login');
+function lewatiOnboarding() {
+  router.push('/beranda');
+}
+
+function lanjutSlide() {
+  router.push('/onboarding-3');
+}
+
+function kembaliSlide() {
+  router.back();
+}
 </script>
 
 <style scoped>
-.slide-content {
-  --background: #eaf1fd;
+.peserta-content {
+  --background: #f7f9fb;
 }
 
-/* Layout penuh layar. Di HP/Android mengisi seluruh lebar; di layar lebar
-   (browser desktop) hanya isinya yang dibatasi 560px dan diletakkan di tengah,
-   latar belakang tetap penuh. */
-.slide {
-  --pad-x: max(20px, calc((100% - 560px) / 2));
-
+.page {
+  min-height: 100%;
   display: flex;
   flex-direction: column;
-  width: 100%;
-  height: 100%;
-  background: #eaf1fd;
-  color: #0d1117;
-  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background: #f7f9fb;
+  color: #191c1e;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+ion-icon {
+  flex: none;
+  font-size: 20px;
+}
+
+button {
+  border: 0;
+  background: none;
+  padding: 0;
+  font-family: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+h1,
+p {
+  margin: 0;
+}
+
+small {
+  font-size: 11px;
 }
 
 /* ---------- Header ---------- */
-.header {
-  position: relative;
-  z-index: 2;
-  flex: none;
+
+.bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 64px;
-  padding: env(safe-area-inset-top, 0px) var(--pad-x) 0;
-  background: #ffffff;
-  box-shadow: 0 2px 8px rgba(15, 40, 80, 0.14);
+  gap: 8px;
+  padding: calc(env(safe-area-inset-top, 0px) + 12px) 16px 10px;
+  background: transparent;
 }
+
 .brand {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
+
 .brand__logo {
-  width: 36px;
-  height: 40px;
-  object-fit: contain;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #dce7ff 0%, #bfd6ff 100%);
+  color: #003178;
+  box-shadow: 0 2px 5px rgba(0, 49, 120, 0.12);
 }
+
+.brand__logo ion-icon {
+  font-size: 20px;
+}
+
 .brand__text {
   display: flex;
   flex-direction: column;
-  line-height: 1.2;
-}
-.brand__text strong {
-  font-size: 18px;
-  font-weight: 800;
-}
-.brand__text span {
-  font-size: 12px;
-  color: #1f2937;
-}
-.skip {
-  padding: 8px 0 8px 8px;
-  border: 0;
-  background: none;
-  font-size: 12px;
-  font-weight: 700;
-  color: #1a5a9a;
 }
 
-/* ---------- Isi ---------- */
-.body {
+.brand__text strong {
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 800;
+  color: #003178;
+  letter-spacing: 0.2px;
+}
+
+.brand__text span {
+  font-size: 9.5px;
+  line-height: 13px;
+  font-weight: 700;
+  color: #606572;
+  letter-spacing: 0.4px;
+}
+
+.btn-skip {
+  padding: 6px 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #50545d;
+}
+
+/* ---------- Main Container ---------- */
+
+.main {
   flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  scrollbar-width: none;
-  padding: 16px var(--pad-x) 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 6px 18px calc(env(safe-area-inset-bottom, 0px) + 22px);
 }
-.body::-webkit-scrollbar {
-  display: none;
-}
+
+/* ---------- Step Pill ---------- */
 
 .step-pill {
+  align-self: flex-start;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  height: 24px;
-  padding: 0 12px;
+  padding: 6px 12px;
   border-radius: 999px;
-  background: #cbdcf2;
-  font-size: 10.5px;
-  font-weight: 600;
-  color: #1c3556;
+  background: #e6effd;
+  border: 1px solid #cde0fc;
+  color: #003178;
+  font-size: 11.5px;
+  font-weight: 700;
 }
+
 .step-pill ion-icon {
-  font-size: 13px;
-  color: #0a4f8f;
-}
-
-/* Kartu pratinjau */
-.preview {
-  margin-top: 24px;
-  padding: 18px 12px 0;
-  overflow: hidden;
-  border: 1px solid #ced6e2;
-  border-radius: 16px;
-  background: #f2f6fd;
-}
-.chips {
-  display: flex;
-  align-items: stretch;
-  gap: 10px;
-  height: 44px;
-}
-.chip {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1.2;
-  text-align: center;
-}
-.chip--blue {
-  background: #1b64ab;
-  color: #ffffff;
-}
-.chip--grey {
-  background: #e7e5e4;
-  color: #3b3b3b;
-}
-.chip--ssl {
-  gap: 4px;
-  border: 1px solid #e3e8ef;
-  border-radius: 12px;
-  background: #ffffff;
-  color: #1f2937;
-  font-size: 10.5px;
-  text-align: left;
-}
-.chip--ssl ion-icon {
-  flex: none;
   font-size: 15px;
-  color: #0a4f8f;
+  color: #003178;
 }
 
-/* Kartu guru pembimbing */
-.teacher {
+/* ---------- Illustration Mockup Card ---------- */
+
+.illustration-card {
   position: relative;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  min-height: 76px;
-  margin-top: 22px;
-  padding: 0 14px;
-  border: 1px solid #d6dde8;
-  border-bottom: 0;
-  border-radius: 14px 14px 0 0;
-  background: #ffffff;
+  padding: 14px 14px 0;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #eef3fa 0%, #f4f7fc 100%);
+  border: 1px solid #dde3ee;
+  box-shadow: 0 4px 14px rgba(0, 49, 120, 0.06);
+  overflow: hidden;
 }
-.teacher__avatar {
-  flex: none;
-  display: flex;
+
+.format-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr) 1.25fr;
+  gap: 7px;
   align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: #a9c5ee;
-  color: #12356a;
-  font-size: 22px;
+  margin-bottom: 14px;
 }
-.teacher__info {
+
+.format-badge {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  max-width: 150px;
-}
-.teacher__info strong {
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 1.25;
-}
-.teacher__info span {
-  font-size: 9.5px;
-  font-weight: 600;
-  color: #1f2937;
-}
-.teacher__badge {
-  position: absolute;
-  top: 8px;
-  right: 10px;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 8px;
-  border: 1px solid #b5e3c6;
-  border-radius: 999px;
-  background: #dff5e7;
-  font-size: 8.5px;
-  font-weight: 600;
-  color: #1b8a45;
-}
-.teacher__badge i {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #22a559;
-}
-
-/* Judul + deskripsi */
-.title {
-  margin: 32px 0 10px;
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 30px;
-  letter-spacing: -0.2px;
-}
-.desc {
-  margin: 0 0 28px;
-  font-size: 13px;
-  line-height: 22px;
-  color: #1c2430;
-}
-
-/* Kartu fitur */
-.feature {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  min-height: 76px;
-  margin-bottom: 16px;
-  padding: 12px 16px;
-  border: 1px solid #d9dee6;
-  border-radius: 12px;
-  background: #e6e9ee;
-}
-.feature__icon {
-  flex: none;
-  display: flex;
-  align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
-  border: 1px solid #d3d9e2;
+  padding: 7px 8px;
   border-radius: 9px;
-  background: #ffffff;
-  color: #12447a;
-  font-size: 19px;
-}
-.feature__icon svg {
-  width: 19px;
-  height: 19px;
-}
-.feature__text {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.feature__text strong {
-  font-size: 12px;
-  font-weight: 700;
-  color: #111827;
-}
-.feature__text span {
-  font-size: 10px;
-  line-height: 1.45;
-  color: #6b7280;
+  line-height: 1.2;
 }
 
-/* ---------- Footer ---------- */
-.footer {
-  flex: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 14px var(--pad-x) calc(16px + env(safe-area-inset-bottom, 0px));
-  border-top: 1px solid #e1e8f3;
-  background: #f2f6fd;
+.format-badge strong {
+  font-size: 11px;
+  font-weight: 800;
 }
-.dots {
+
+.format-badge span {
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  opacity: 0.9;
+}
+
+.format-badge--blue {
+  background: #1d4ed8;
+  color: #fff;
+}
+
+.format-badge--teal {
+  background: #005b8f;
+  color: #fff;
+}
+
+.format-badge--gray {
+  background: #e5e9f0;
+  color: #50545d;
+}
+
+.ssl-pill {
   display: flex;
   align-items: center;
   gap: 5px;
-}
-.dots span {
-  width: 8px;
-  height: 8px;
+  padding: 6px 9px;
   border-radius: 999px;
-  background: #9ca3af;
+  background: #fff;
+  border: 1px solid #dfe5f0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 11px;
+  color: #191c1e;
 }
-.dots span.active {
-  width: 42px;
-  background: #0a4f8f;
+
+.ssl-pill ion-icon {
+  font-size: 15px;
+  color: #0b4fa6;
+}
+
+/* Mentor Preview Inside Card */
+
+.mentor-preview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 12px 14px;
+  border-radius: 16px 16px 0 0;
+  background: #fff;
+  border: 1px solid #e2e7f0;
+  border-bottom: 0;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.mentor-preview__avatar {
+  width: 38px;
+  height: 38px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #e3eeff;
+  color: #0b4fa6;
+}
+
+.mentor-preview__avatar ion-icon {
+  font-size: 22px;
+}
+
+.mentor-preview__info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.mentor-preview__info strong {
+  font-size: 12.5px;
+  font-weight: 800;
+  line-height: 17px;
+  color: #191c1e;
+}
+
+.mentor-preview__info small {
+  font-size: 10.5px;
+  color: #606572;
+}
+
+.mentor-preview__status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: none;
+}
+
+.verified-icon {
+  font-size: 17px;
+  color: #003178;
+}
+
+.nuptk-pill {
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #d9f4e4;
+  color: #0b5f3a;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+/* ---------- Hero Copy ---------- */
+
+.hero-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.hero-copy h1 {
+  font-size: 23px;
+  line-height: 30px;
+  font-weight: 800;
+  color: #003178;
+  letter-spacing: -0.3px;
+}
+
+.hero-copy p {
+  font-size: 13px;
+  line-height: 20px;
+  color: #50545d;
+}
+
+/* ---------- Feature List ---------- */
+
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 13px 14px;
+  border-radius: 14px;
+  background: #eef2f7;
+  border: 1px solid #e1e6ef;
+}
+
+.feature-item__icon {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #fff;
+  color: #003178;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.feature-item__icon ion-icon {
+  font-size: 18px;
+}
+
+.feature-item__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.feature-item__text strong {
+  font-size: 13px;
+  font-weight: 800;
+  color: #191c1e;
+}
+
+.feature-item__text p {
+  font-size: 11.5px;
+  line-height: 16px;
+  color: #50545d;
+}
+
+/* ---------- Slide Indicator Dots ---------- */
+
+.slide-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #cfd5e1;
+  transition: all 0.2s ease;
+}
+
+.dot--active {
+  width: 24px;
+  background: #003178;
+}
+
+/* ---------- Navigation Actions ---------- */
+
+.nav-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
 }
 
 .btn-next {
@@ -436,42 +559,51 @@ const lewati = () => router.replace('/login');
   justify-content: center;
   gap: 8px;
   width: 100%;
-  height: 46px;
-  margin-top: 18px;
-  border: 0;
-  border-radius: 10px;
-  background: #0a5190;
-  color: #ffffff;
-  font-size: 14px;
-  font-weight: 700;
-}
-.btn-next ion-icon {
-  font-size: 18px;
-}
-.btn-next:active {
-  opacity: 0.9;
+  min-height: 50px;
+  border-radius: 14px;
+  background: #003178;
+  color: #fff;
+  font-size: 14.5px;
+  font-weight: 800;
+  box-shadow: 0 4px 12px rgba(0, 49, 120, 0.25);
 }
 
-.btn-back {
+.btn-next ion-icon {
+  font-size: 19px;
+}
+
+.btn-prev {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  margin-top: 14px;
-  padding: 4px 8px;
-  border: 0;
-  background: none;
-  font-size: 12px;
-  font-weight: 500;
-  color: #4b5563;
-}
-.btn-back ion-icon {
-  font-size: 14px;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #50545d;
 }
 
-.skip:focus-visible,
-.btn-next:focus-visible,
-.btn-back:focus-visible {
-  outline: 2px solid #0a4f8f;
-  outline-offset: 2px;
+.btn-prev ion-icon {
+  font-size: 16px;
+}
+
+/* ---------- Security Footer ---------- */
+
+.security-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #606572;
+  text-align: center;
+}
+
+.security-footer ion-icon {
+  font-size: 13px;
+  color: #003178;
 }
 </style>

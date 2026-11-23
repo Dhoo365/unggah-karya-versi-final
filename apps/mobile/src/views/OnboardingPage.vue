@@ -12,7 +12,7 @@
             </svg>
             <div class="brand__text">
               <strong>SIKARYA</strong>
-              <span>Moti Versteppen</span>
+              <span>Dikda Sulut</span>
             </div>
           </div>
           <button class="skip" type="button" @click="skip">Lewati</button>

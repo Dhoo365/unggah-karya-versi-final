@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from '@ionic/vue-router';
 // Halaman onboarding
 import OnboardingPage from '@/views/OnboardingPage.vue';
 import OnBoardingSlide2 from '@/views/OnBoardingSlide2.vue';
+import OnBoardingSlide3 from '../views/OnBoardingSlide3.vue';
 
 // Halaman admin
 import AdminBeranda from '@/views/admin/AdminBeranda.vue';
@@ -66,6 +67,11 @@ const routes = [
     path: '/onboarding2', 
     name: 'OnboardingSlide2', 
     component: OnBoardingSlide2 
+  },
+  {
+    path: '/onboarding3',
+    name: 'OnBoardingSlide3',
+    component: OnBoardingSlide3
   },
 
   // admin

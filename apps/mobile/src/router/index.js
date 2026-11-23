@@ -11,12 +11,14 @@ import AdminPeserta from '@/views/admin/AdminPeserta.vue';
 import AdminJuri from '@/views/admin/AdminJuri.vue';
 import AdminKriteria from '@/views/admin/AdminKriteria.vue';
 import AdminTalenta from '@/views/admin/AdminTalenta.vue';
+import AdminLogin from '../views/admin/AdminLogin.vue';
 
 // Halaman juri
 import JuriLombaTugas from '@/views/juri/JuriLombaTugas.vue';
 import JuriAnteran from '../views/juri/JuriAnteran.vue';
 import JuriRiwayat from '../views/juri/JuriRiwayat.vue';
 import JuriProfil from '../views/juri/JuriProfil.vue';
+import JuriLogin from '../views/juri/JuriLogin.vue';
 
 //Halaman Guru
 import GuruBeranda from '../views/Guru/GuruBeranda.vue';
@@ -35,6 +37,7 @@ import GuruPengajuanDitolak from '../views/Guru/GuruPengajuanDitolak.vue';
 import GuruRiwayatSiswa from '../views/Guru/GuruRiwayatSiswa.vue';
 import GuruKelolaStatus from '../views/Guru/GuruKelolaStatus.vue';
 import GuruUnggahKarya from '../views/Guru/GuruUnggahKarya.vue';
+import GuruLogin from '../views/Guru/GuruLogin.vue';
 
 //Halaman Siswa
 import SiswaValidasiSertifikat from '../views/Siswa/SiswaValidasiSertifikat.vue';
@@ -51,8 +54,11 @@ import SiswaUnggah from '../views/Siswa/SiswaUnggah.vue';
 import SiswaBeranda from '../views/Siswa/SiswaBeranda.vue';
 
 
+
+
 // Halaman contoh (tersambung ke backend)
 import HomePage from '@/views/HomePage.vue';
+import SiswaLogin from '../views/Siswa/SiswaLogin.vue';
 
 const routes = [
   { path: '/', redirect: '/onboarding' },
@@ -100,6 +106,11 @@ const routes = [
     name: 'Talenta', 
     component: AdminTalenta 
   },
+  {
+    path: '/adminlogin',
+    name: 'AdminLogin',
+    component: AdminLogin
+  },  
 
   // juri
   { 
@@ -121,6 +132,11 @@ const routes = [
     path: '/profiljuri',
     name: 'ProfilJuri',
     component: JuriProfil
+  },
+  {
+    path: '/jurilogin',
+    name: 'JuriLogin',
+    component: JuriLogin
   },
 
   // Guru
@@ -204,6 +220,12 @@ const routes = [
   name: 'GuruUnggahKarya',
   component: GuruUnggahKarya
  },
+ {
+  path: '/gurulogin',
+  name: 'GuruLogin',
+  component: GuruLogin
+ },
+
 
  //Siswa
  {
@@ -265,6 +287,11 @@ const routes = [
   path: '/siswaberanda',
   name: 'SiswaBeranda',
   component: SiswaBeranda
+ },
+ {
+  path: '/siswalogin',
+  name: 'SiswaLogin',
+  component: SiswaLogin
  },
  
 

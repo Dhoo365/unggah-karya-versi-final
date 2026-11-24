@@ -31,6 +31,7 @@
 
         <p class="intro">Silakan pilih peran Anda untuk memulai registrasi akun resmi di SIKARYA Dikda Sulut.</p>
 
+        <!-- Kartu Pendaftaran Utama (Siswa, Guru, Dewan Juri) -->
         <article
           v-for="r in roles"
           :key="r.key"
@@ -62,6 +63,36 @@
             <b class="role__link" :class="'role__link--' + r.tone">Daftar sebagai {{ r.short }}</b>
             <span class="role__go" :class="'role__go--' + r.tone"><ion-icon :icon="arrowForwardOutline" /></span>
           </div>
+        </article>
+
+        <!-- Kartu Portal Khusus (Admin Dikda & Eksekutif Pimpinan) -->
+        <article
+          v-for="p in specialPortals"
+          :key="p.key"
+          class="portal-card"
+          :class="{ 'role--selected': selected === p.key }"
+          role="button"
+          tabindex="0"
+          :aria-label="p.name"
+          @click="choosePortal(p)"
+          @keydown.enter.prevent="choosePortal(p)"
+          @keydown.space.prevent="choosePortal(p)"
+        >
+          <div class="portal-card__icon" :class="'portal-card__icon--' + p.tone">
+            <ion-icon :icon="p.icon" />
+          </div>
+
+          <div class="portal-card__body">
+            <div class="portal-card__top">
+              <h2 class="portal-card__name">{{ p.name }}</h2>
+              <span class="portal-card__tag" :class="'portal-card__tag--' + p.tone">{{ p.tag }}</span>
+            </div>
+            <p class="portal-card__desc">{{ p.desc }}</p>
+          </div>
+
+          <span class="portal-card__go" aria-hidden="true">
+            <ion-icon :icon="arrowForwardOutline" />
+          </span>
         </article>
       </div>
     </ion-content>
@@ -96,6 +127,7 @@ import {
   peopleOutline,
   hammerOutline,
   shieldCheckmarkOutline,
+  shieldOutline,
   clipboardOutline,
   informationCircleOutline,
   helpCircleOutline,
@@ -109,6 +141,16 @@ const HELPDESK_URL = 'https://wa.me/62XXXXXXXXXX?text=Halo%20Helpdesk%20SIKARYA%
 type Role = {
   key: string; name: string; short: string; tone: string; icon: string;
   tag: string; desc: string; reqIcon: string; req: string; muted?: boolean;
+};
+
+type SpecialPortal = {
+  key: string;
+  name: string;
+  tag: string;
+  desc: string;
+  tone: 'blue' | 'amber';
+  icon: string;
+  route: string;
 };
 
 const selected = ref<string | null>(null);
@@ -128,14 +170,35 @@ const roles: Role[] = [
     reqIcon: clipboardOutline, req: 'Memerlukan NUPTK/NIP dan SK Penugasan Kepala Sekolah',
   },
   {
-    key: 'juri', name: 'Dewan Juri', short: 'Juri', tone: 'sky', icon: hammerOutline, muted: true,
+    key: 'juri', name: 'Dewan Juri', short: 'Juri', tone: 'sky', icon: hammerOutline,
     tag: 'Penilai & Kurator Lomba',
     desc: 'Aktivasi akun panelis juri independen atau akademisi untuk penilaian karya, rubrik skor, dan kurasi talenta FLS2N/O2SN Kota Manado.',
     reqIcon: shieldCheckmarkOutline, req: 'Memerlukan NIP/NIDN, Pakta Integritas, dan SK Penetapan Kadis',
   },
 ];
 
-/** Dewan Juri (kartu redup) perlu konfirmasi dulu karena aktivasinya lewat SK. */
+const specialPortals: SpecialPortal[] = [
+  {
+    key: 'admin',
+    name: 'Masuk sebagai Admin Dikda',
+    tag: 'Khusus Staf',
+    desc: 'Akses portal administrator & verifikator Dinas Dikda',
+    tone: 'blue',
+    icon: shieldCheckmarkOutline,
+    route: ROLE_ROUTES.admin ?? '/login-admin',
+  },
+  {
+    key: 'pimpinan',
+    name: 'Portal Eksekutif Pimpinan',
+    tag: 'Khusus Pimpinan',
+    desc: 'Akses khusus Kepala Balai, Dewan Pengarah & Otorisasi TTE BSrE',
+    tone: 'amber',
+    icon: shieldOutline,
+    route: ROLE_ROUTES.pimpinan ?? '/login-pimpinan',
+  },
+];
+
+/** Opsi tambahan jika peran tertentu diberi flag muted */
 async function confirmMuted(r: Role): Promise<boolean> {
   const alert = await alertController.create({
     header: `Daftar sebagai ${r.short}?`,
@@ -153,11 +216,24 @@ async function confirmMuted(r: Role): Promise<boolean> {
 async function choose(r: Role) {
   if (busy) return;
   busy = true;
-  selected.value = r.key; // sorot kartu sebagai umpan balik
+  selected.value = r.key;
   try {
     if (r.muted && !(await confirmMuted(r))) return;
     await new Promise((res) => setTimeout(res, 120));
     ionRouter.navigate(ROLE_ROUTES[r.key] ?? ROUTES.login, 'forward', 'push');
+  } finally {
+    selected.value = null;
+    busy = false;
+  }
+}
+
+async function choosePortal(p: SpecialPortal) {
+  if (busy) return;
+  busy = true;
+  selected.value = p.key;
+  try {
+    await new Promise((res) => setTimeout(res, 120));
+    ionRouter.navigate(p.route, 'forward', 'push');
   } finally {
     selected.value = null;
     busy = false;
@@ -177,7 +253,7 @@ const openHelpdesk = () => window.open(HELPDESK_URL, '_blank', 'noopener');
 
 .akun {
   min-height: 100%;
-  padding: calc(env(safe-area-inset-top, 0px) + 10px) 20px 20px;
+  padding: calc(env(safe-area-inset-top, 0px) + 10px) 20px 24px;
   background: #fff;
   font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
   color: #0f172a;
@@ -270,7 +346,7 @@ const openHelpdesk = () => window.open(HELPDESK_URL, '_blank', 'noopener');
   color: #475569;
 }
 
-/* Kartu peran */
+/* Kartu peran utama */
 .role {
   padding: 18px;
   margin-top: 18px;
@@ -283,12 +359,14 @@ const openHelpdesk = () => window.open(HELPDESK_URL, '_blank', 'noopener');
   -webkit-tap-highlight-color: transparent;
 }
 
-.role:active {
+.role:active,
+.portal-card:active {
   transform: scale(0.99);
 }
 
 .role--selected,
-.role:focus-visible {
+.role:focus-visible,
+.portal-card:focus-visible {
   border-color: #0b4a8f;
   box-shadow: 0 0 0 3px rgba(11, 74, 143, 0.18);
   outline: none;
@@ -339,8 +417,8 @@ const openHelpdesk = () => window.open(HELPDESK_URL, '_blank', 'noopener');
 }
 
 .role__icon--sky {
-  background: #5fa3d6;
-  color: #fff;
+  background: #cfe3fb;
+  color: #00639a;
 }
 
 .role__name {
@@ -439,19 +517,107 @@ const openHelpdesk = () => window.open(HELPDESK_URL, '_blank', 'noopener');
   font-size: 22px;
 }
 
-.role__go--blue {
+.role__go--blue,
+.role__go--amber,
+.role__go--sky {
   background: #d7e4fb;
   color: #0b4a8f;
 }
 
-.role__go--amber {
-  background: #cfe3fb;
-  color: #0b4a8f;
+/* Kartu Portal Khusus (Admin Dikda & Eksekutif Pimpinan) */
+.portal-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  margin-top: 16px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.role__go--sky {
-  background: #5fa3d6;
-  color: #fff;
+.portal-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  flex: none;
+  border-radius: 15px;
+  font-size: 26px;
+}
+
+.portal-card__icon--blue {
+  background: #d9e8fb;
+  color: #0b3d91;
+}
+
+.portal-card__icon--amber {
+  background: #fde6bd;
+  color: #6b4200;
+}
+
+.portal-card__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.portal-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.portal-card__name {
+  font-size: 16px;
+  line-height: 21px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.portal-card__tag {
+  flex: none;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.portal-card__tag--blue {
+  background: #dce7fd;
+  color: #163e8c;
+}
+
+.portal-card__tag--amber {
+  background: #fde6bd;
+  color: #6b4200;
+}
+
+.portal-card__desc {
+  margin-top: 5px !important;
+  font-size: 12.5px;
+  line-height: 18px;
+  color: #475569;
+}
+
+.portal-card__go {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex: none;
+  border-radius: 50%;
+  background: #e2ecfc;
+  color: #0b4a8f;
+  font-size: 18px;
 }
 
 /* Dock bawah */

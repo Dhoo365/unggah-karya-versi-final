@@ -120,8 +120,6 @@ const slides = [
     competitions: [
       { label: 'FLS3N', icon: musicalNotesOutline },
       { label: 'O2SN', icon: footballOutline },
-      { label: 'JURDOL', icon: flaskOutline },
-      { label: 'DRAG RACE', icon: carSportOutline },
     ],
     step: 'Temukan Kompetisi',
     title: 'Panggung Talenta Pelajar',
@@ -249,26 +247,28 @@ const slide = slides[0];
 .chips {
   list-style: none;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
   padding: 0;
-  margin: 12px 4px 0;
+  margin: 14px 4px 0;
 }
 .chip {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
-  padding: 7px 2px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.6);
-  font-size: 8.5px;
+  justify-content: center;
+  gap: 5px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
   font-weight: 800;
   color: #334155;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08);
 }
 .chip ion-icon {
-  font-size: 15px;
-  color: #475569;
+  font-size: 24px;
+  color: #1d4f9c;
 }
 
 .copy {

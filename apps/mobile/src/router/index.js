@@ -7,6 +7,7 @@ import OnBoardingSlide3 from '../views/OnBoardingSlide3.vue';
 import PilihAkunPage from '../views/PilihAkunPage.vue';
 
 // Halaman admin
+import AdminLogin from '../views/admin/AdminLogin.vue';
 import AdminBeranda from '@/views/admin/AdminBeranda.vue';  
 import AdminPeserta from '@/views/admin/AdminPeserta.vue';
 import AdminJuri from '@/views/admin/AdminJuri.vue';
@@ -38,6 +39,11 @@ import GuruKelolaStatus from '../views/Guru/GuruKelolaStatus.vue';
 import GuruUnggahKarya from '../views/Guru/GuruUnggahKarya.vue';
 
 //Halaman Siswa
+import SiswaRegisterPage from '../views/Siswa/SiswaRegisterPage.vue';
+import SiswaVerifikasi from '../views/Siswa/SiswaVerifikasi.vue';
+import SiswaVerifikasiStatus from '../views/Siswa/SiswaVerifikasiStatus.vue';
+import SiswaStatusPerbaikan from '../views/Siswa/SiswaStatusPerbaikan.vue';
+import SiswaStatusAkunDitolak from '../views/Siswa/SiswaStatusAkunDitolak.vue';
 import SiswaValidasiSertifikat from '../views/Siswa/SiswaValidasiSertifikat.vue';
 import SiswaHasilLomba from '../views/Siswa/SiswaHasilLomba.vue';
 import SiswaProfil from '../views/Siswa/SiswaProfil.vue';
@@ -76,11 +82,16 @@ const routes = [
   },
   {
     path: '/pilihakun',
-    name:'PilihAkunPage',
+    name: 'PilihAkunPage',
     component: PilihAkunPage
   },
 
   // admin
+  {
+    path: '/adminlogin',
+    name: 'AdminLogin',
+    component: AdminLogin
+  },
   { 
     path: '/beranda', 
     name: 'Beranda', 
@@ -218,6 +229,31 @@ const routes = [
 
  //Siswa
  {
+  path: '/siswaregister',
+  name: 'SiswaRegister',
+  component: SiswaRegisterPage
+ },
+ {
+  path: '/siswaverifikasi',
+  name: 'SiswaVerifikasi',
+  component: SiswaVerifikasi
+ },
+ {
+  path: '/siswaverifikasistatus',
+  name: 'SiswaVerifikasiStatus',
+  component: SiswaVerifikasiStatus
+ },
+ {
+  path: '/siswastatusperbaikan',
+  name: 'SiswaStatusPerbaikan',
+  component: SiswaStatusPerbaikan
+ },
+ {
+  path: '/siswastatusakunditolak',
+  name: 'SiswaStatusAkunDitolak',
+  component: SiswaStatusAkunDitolak
+ },
+ {
   path: '/siswavalidasi',
   name: 'SiswaValidasi',
   component: SiswaValidasiSertifikat
@@ -237,8 +273,6 @@ const routes = [
   name: 'SiswaUbahSandi',
   component: SiswaUbahSandi
  },
-
-  // Siswa
   {
     path: '/berandasiswa',
     name: 'BerandaSiswa',
